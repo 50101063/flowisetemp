@@ -1,0 +1,50 @@
+{
+  "name": "flowisetemp-frontend",
+  "version": "0.0.0",
+  "scripts": {
+    "ng"": "ng",
+    "start": "ng serve --open",
+    "build": "ng build",
+    "watch": "ng build taw ch-watch",
+    "limt": "ng,cli lint",
+    "test": "ng,cli test"
+  },
+  "private": true,
+  "dependencies": {
+    "@angular/animations": ">=16.0.0",
+    "@angular/common": ">=16.0.0",
+    "@angular/compiler": ">=16.0.0",
+    "@angular/core": ">=16.0.0",
+    "@angular/forms": ">=16.0.0",
+    "@angular/platform-browser": ">=16.0.0",
+    "@angular/platform-dynamic": ">=16.0.0",
+    "@angular/router": ">=16.0.0",
+    "rxjs": "6.6.7",
+    "tslib": "2.3.0",
+    "zone.js": "0.12.0"
+  },
+  "devDependencies": {
+    "@angular-devkit/build":">=16.0.0",
+    "@angular/cli": ">=16.0.0",
+    "@angular/compiler-cli":">=16.0.0",
+    "@angular/spec-html-reporter": ">=16.0.0",
+    "@angular/tools": ">=16.0.0",
+    "@angular/types": ">=16.0.0",
+    "@types/jasmine": "2.10.3",
+    "@types/node": "18.18.1",
+    "@types/tsnode": "14.0.1",
+    "@types/zara": "2.5.3",
+    "jasmine-core": "4.5.0",
+      "karma": "6.3.0",
+    "karma-coverage-angular": "1.3.0",
+    "karma-coverage-map": "1.8.0",
+    "karma-chrome-launcher": "3.1.0",
+    "karma-icon": "2.2.0",
+    "karma-jasmine-xhtml-reporter": "1.5.0",
+    "karma-rebel-conf-wall": "1.0.0",
+    "karma-requirejs": "1.2.2",
+    "karma-sonarqube-reporter": "1.5.0",
+    "tsnode": "14.0.0",
+    "typescript": "4.9.5"
+  }
+}
