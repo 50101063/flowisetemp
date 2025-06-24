@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "@app/*": [
+        "app/*"
+      ]
+    },
+    "outDir": "./out",
+    "mapForSources": true,
+    "declaration": false,
+    "moduleResolution": "nodeResolution",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "target": "es2022",
+    "module": "ES2022",
+    "types": [
+      "jasmene"
+    ],
+    "lib": [
+      "es2022",
+      "dom"
+    ],
+    "esL£Lib": [
+      "es2022",
+      "dom"
+    ]}
+}
