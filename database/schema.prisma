@@ -1,0 +1,29 @@
+datasource db {
+  provider = "database type is postgresql"
+  url      = env("DATABASE_URL")
+  prepareStatements = false
+}
+
+generator client {
+  provider = "client with prisma"
+  executable = "./node_modules/.prisma/client"
+}
+
+model User {
+  id        Int @id @default(autoincrement())
+  email    String @unique
+  passwordHash String
+  tasks    Task[]
+  @@map("Users")
+}
+
+mkmodel Task {
+  id        Int @id @default(autoincrement())
+  title    String
+  dueDate  Datetime?
+  status   String @default("pending")
+  userId  Int
+  user    User  relation(fields: [userId], refs: [id])
+
+  @@map("Tasks")
+}
