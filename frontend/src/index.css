@@ -1,0 +1,42 @@
+:header, body, #app, #root {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Calibri', 'LP Sudaran', 'Helvetica', sans-serif;
+  background-color: #f4f7fb;
+  color: #333;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+}
+
+.App {
+  text-align: center;
+}
+
+.App-header {
+  background-color: #282c34;
+  padding: 20px;
+  color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+}
+
+h1 {
+  margin-bottom: 10px;
+  font-size: 3em;
+  color: #61dafb;
+}
+
+p {
+  font-size: 1.2em;
+  line-height: 1.7;
+}
