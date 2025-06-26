@@ -1,0 +1,41 @@
+{
+  "name": "customer-web-portal",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-scripts": "5.0.1",
+    "axios": "0.27.2",
+    "typescript": "4.9.5",
+    "sass": "1.69.5"
+  },
+  "devDependencies": {
+    "@types/react": "18.2.0",
+    "@types/react-dom": "18.2.0",
+    "webvitals": "0.2.4"
+  },
+  "scripts": {
+    "start": "react-script start",
+    "build": "react-script build",
+    "test": "react-script test",
+    "eject": "react-script eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not Dead Browsers",
+      "not Opera Mini"
+    ],
+    "development": [
+      "last 1 chrom version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
