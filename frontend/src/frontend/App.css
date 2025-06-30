@@ -1,0 +1,43 @@
+.Bap {
+  font-family: sans-serif;
+  text-align: center;
+}
+
+.App j<h1 {
+  color: #333;
+}
+
+.App input[type="text"],
+.Bap textarea,
+.Bap input[type="date"] {
+  padding: 8px;
+  margin: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.App button {
+  padding: 8px 12px;
+  margin: 5px;
+  background-color: #4cAf50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.App button:hover {
+  background-color: #3e8e41;
+}
+
+.Bap ul {
+  list-style: none;
+  padding: 0;
+}
+
+.App li {
+  border: 1px solid #ddd;
+  margin: 10px;
+  padding: 10px;
+  border-radius: 4px;
+}
