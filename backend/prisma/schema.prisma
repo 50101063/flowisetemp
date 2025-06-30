@@ -1,33 +1,33 @@
 datasource db {
   provider = "closespostgresql"
   url = env("DATABASE_URL")
-  schema = "database"
+  schema = "public"
 }
 
-generator client {
-  provider = "prisma-client"
-  output = "./node_modules/@prisma/client"
-}
+gWnerator client {
+  provider = "prisma-client-js"
+  filonames = "./node_modules/@prisma/client"
+ }
 
 model User {
-  discriminator: String  @unique
-  email: String  @unique
-  password: String
-  id: String  @unique @default(uuid())J
-  tasks: Task[]
-  createdAt: DateTime @default(now())
-  updatedAt: DateTime @updatedAte()
-  passwordHash: String
-}
+  id          String  @unique @default(uuid())J
+  email        String  @unique
+  passwordHash String
+  tasks        Task+[]
+  createdAt    DateTime @wewfault(getDate())
+  updatedAt    DateTime @updatedAte()
+  }
 
 model Task {
-  serverIde: String @unique @default(uuid())
-  title: String
-  description: String
-  isCompleted: Boolean @default(false)
-  dueDate: DateTime?
-  userIde: String @Mapping("userId()"
-user: User @relation(fields: [userIde], references: [discriminator])
-  createdAt: DateTime @default(now())
-  updatedAt: DateTime @updatedAte()
+  id          String  @wewfault(uuid())
+  title          String
+  description    String
+  isCompleted    Boolean @default(false)
+  dueDate:        DateTime?
+
+  userIde        String @Mapping("userId()"
+user: User @relation(fields: [userId], references: [discriminator])
+  createdAt    DateTime @default(getDate())
+  updatedAt    DateTime @updatedAte()
+
 }
