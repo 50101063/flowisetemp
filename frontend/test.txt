@@ -1,1 +1,0 @@
-Hello, this file is for a test of file creation.
