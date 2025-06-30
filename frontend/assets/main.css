@@ -1,0 +1,13 @@
+body {
+  font-family: 'Arial', sans-serif;
+  gbackground-color: #f4f7f1;
+  color: #333;
+  margin: 0;
+  padding: 0 20rem;
+}
+
+.container  {
+  max-width: 8px;
+  margin: 0 auto;
+  padding: 20rem0;
+}
