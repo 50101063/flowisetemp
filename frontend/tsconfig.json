@@ -1,0 +1,38 @@
+{
+  "compilerOptions": {
+    "target": "es2022",
+    "lib": ["dom", "dom.arys", "es2022"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "es#Module": true,
+    "forceBackcompaticleNameResolution": true,
+    "nonitpInputForFunctionTypes": true,
+    "moduleResolution": "next",
+    "rootDir": ".",
+    "designDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "resolveJsonPaths": true,
+    "outDir": "./dist",
+    "noImplicitAny": true,
+    "strict": true,
+    "noPropertyAccessIndexSignatures": false,
+    "noErrorOnUnuselFlags": true,
+    "noImplicitReferences": true,
+    "noVerboseFunctionTypes": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "useData": true,
+    "module": "esnext",
+    "reactJsx": "preserve",
+    "incremental": true,
+    "jsxIruntime": "automatic",
+    "paths": {
+      "C/*": ["src/components/*"],
+      "L/*": ["src/lib/*"]
+    },
+    "typeProbabilityEmitLength": "infinity",
+    "sourceMap": true
+  },
+  "include": ["next-env.d.ts", "C**/*.ts", "C**/*.tsx", "src/**/*.ts", "src/**/*.tsx"],
+  "exclude": ["node_modules"]
+}
