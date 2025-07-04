@@ -1,82 +1,89 @@
-# Database Setup and Management for Online Course Registration System
+# Database Setup and Management for Personal Recipe Card Organizer
 
-This directory contains all the SQL scripts and configurations for the PostgreSQL database of the Online Course Registration System.
+This directory contains all the necessary SQL scripts and documentation for setting up, managing, and interacting with the PostgreSQL database for the Personal Recipe Card Organizer application.
 
 ## Database Technology
-*   **PostgreSQL 15+**
 
-## Structure
-The `database/` folder is organized as follows:
-*   `schema/`: Contains SQL scripts for creating tables, defining constraints, and setting up the initial database schema.
-*   `migrations/`: (Placeholder) Future scripts for database migrations (e.g., Flyway, Alembic) will reside here.
-*   `data/`: (Placeholder) Scripts for initial data seeding or lookup tables.
-*   `scripts/`: (Placeholder) Utility scripts for database maintenance, backups, etc.
+The chosen database system is **PostgreSQL 15.x**.
+
+## Schema Overview
+
+The database comprises two main tables: `users` and `recipes`.
+
+### `users` Table
+
+Stores user authentication and profile information.
+
+-   `id`: Primary Key, auto-incrementing integer.
+-   `username`: Unique username for login, string.
+-   `password_hash`: Hashed and salted password, string.
+-   `created_at`: Timestamp of user creation.
+
+### `recipes` Table
+
+Stores individual recipe entries associated with a user.
+
+-   `id`: Primary Key, auto-incrementing integer.
+-   `user_id`: Foreign Key referencing `users.id`. Ensures recipes are linked to specific users. `ON DELETE CASCADE` ensures that if a user is deleted, all their recipes are also deleted.
+-   `name`: Name of the recipe, string.
+-   `ingredients`: Text field for recipe ingredients.
+-   `instructions`: Text field for cooking instructions.
+-   `category`: Optional category or tag for the recipe (e.g., "Breakfast", "Dinner", "Dessert").
+-   `created_at`: Timestamp of recipe creation.
+-   `updated_at`: Timestamp of the last update to the recipe. This field is automatically updated by a trigger.
 
 ## Setup Instructions
 
-### Prerequisites
-*   PostgreSQL 15+ installed and running (or access to an AWS RDS PostgreSQL instance).
-*   A database user with appropriate permissions (e.g., `db_admin`).
-*   `psql` client or a similar SQL client for executing scripts.
+To set up the database, follow these steps:
 
-### Steps to Set Up the Database
+1.  **Install PostgreSQL:**
+    Ensure you have PostgreSQL 15.x or later installed on your system. You can download it from the official PostgreSQL website or use your system's package manager.
 
-1.  **Create the Database:**
-    Connect to your PostgreSQL server as a superuser or a user with `CREATEDB` privileges and create a new database for the system.
-    ```sql
-    CREATE DATABASE course_registration_db;
-    ```
-
-2.  **Connect to the Database:**
-    Connect to the newly created database using your database user.
-    ```bash
-    psql -h <your_db_host> -p <your_db_port> -U <your_db_user> -d course_registration_db
-    ```
-    (Replace `<your_db_host>`, `<your_db_port>`, and `<your_db_user>` with your actual database credentials.)
-
-3.  **Execute Schema Creation Scripts:**
-    Navigate to the `database/schema/` directory and execute the SQL scripts in the specified order to create the tables and apply constraints.
+2.  **Create a Database:**
+    Connect to your PostgreSQL server as a superuser or a user with database creation privileges and create a new database for the application.
 
     ```bash
-    # From your terminal, assuming you are in the database/ directory
-    psql -h <your_db_host> -p <your_db_port> -U <your_db_user> -d course_registration_db -f schema/001_create_users_table.sql
-    psql -h <your_db_host> -p <your_db_port> -U <your_db_user> -d course_registration_db -f schema/002_create_courses_table.sql
-    psql -h <your_db_host> -p <your_db_port> -U <your_db_user> -d course_registration_db -f schema/003_create_prerequisites_table.sql
-    psql -h <your_db_host> -p <your_db_port> -U <your_db_user> -d course_registration_db -f schema/004_create_enrollments_table.sql
-    psql -h <your_db_host> -p <your_db_port> -U <your_db_user> -d course_registration_db -f schema/005_create_payments_table.sql
-    psql -h <your_db_host> -p <your_db_port> -U <your_db_user> -d course_registration_db -f schema/006_create_academic_history_table.sql
-    psql -h <your_db_host> -p <your_db_port> -U <your_db_user> -d course_registration_db -f schema/007_create_indexes.sql
+    psql -U postgres
+    CREATE DATABASE recipe_organizer_db;
+    \q
     ```
-    **Important:** Execute these scripts sequentially to ensure dependencies (e.g., foreign keys) are met.
 
-## Database Integration with Backend
-The backend application (Django) uses its ORM to interact with this PostgreSQL database.
-Ensure the `DATABASE` configuration in the Django `settings.py` (typically `course_registration_backend/settings.py`) is correctly pointing to this database instance, including host, port, database name, user, and password.
+3.  **Create a Database User (Optional but Recommended):**
+    For security, it's recommended to create a dedicated user for the application with limited privileges.
 
-Example Django `settings.py` snippet for database configuration:
-```python
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'course_registration_db',
-        'USER': 'your_db_user',
-        'PASSWORD': 'your_db_password',
-        'HOST': 'your_db_host',
-        'PORT': 'your_db_port',
-    }
-}
-```
-(Replace placeholders with actual values, ideally managed via environment variables.)
+    ```bash
+    psql -U postgres
+    CREATE USER recipe_app_user WITH PASSWORD 'your_secure_password';
+    GRANT ALL PRIVILEGES ON DATABASE recipe_organizer_db TO recipe_app_user;
+    \q
+    ```
 
-## Backup and Recovery
-Regular database backups should be configured. For AWS RDS, automated backups are enabled by default. For self-hosted PostgreSQL, use `pg_dump` for logical backups.
+4.  **Run the Schema Script:**
+    Navigate to this `database/` directory in your terminal and execute the `schema.sql` script against your newly created database.
 
-Example `pg_dump` command:
-```bash
-pg_dump -h <your_db_host> -p <your_db_port> -U <your_db_user> -d course_registration_db > course_registration_db_backup_$(date +%Y%m%d%H%M%S).sql
-```
+    ```bash
+    psql -U recipe_app_user -d recipe_organizer_db -f schema.sql
+    ```
+    (Replace `recipe_app_user` and `recipe_organizer_db` with your actual username and database name if different).
 
-## Maintenance
-*   Regularly monitor database performance and resource utilization.
-*   Perform `VACUUM ANALYZE` periodically to optimize query performance and reclaim space.
-*   Review and optimize slow queries as identified by monitoring tools.
+## Database Interaction
+
+The backend application (developed using Python with FastAPI and SQLAlchemy) will interact with this database.
+
+-   **Connection String:** The backend will use a connection string to connect to the database. Example for `recipe_app_user` on `localhost`:
+    `postgresql://recipe_app_user:your_secure_password@localhost:5432/recipe_organizer_db`
+
+-   **ORM Usage:** SQLAlchemy will be used to manage database sessions, perform CRUD operations, and handle data migrations.
+
+## Backup and Recovery (Conceptual)
+
+While specific scripts are not provided in this initial setup, a robust application would include:
+
+-   **Regular Backups:** Implement daily or hourly automated backups of the `recipe_organizer_db` using `pg_dump`.
+-   **Recovery Procedures:** Document and test procedures for restoring the database from backups in case of data loss or corruption.
+
+## Data Migration (Conceptual)
+
+For future schema changes, a database migration tool (e.g., Alembic for SQLAlchemy) should be employed to manage schema versioning and apply incremental updates without data loss.
+
+---
