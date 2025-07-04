@@ -1,3 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Optional: Add some basic global styles here */
+body {
+  font-family: 'Inter', sans-serif;
+  @apply bg-gray-100 text-gray-900;
+}
+
+#root {
+  @apply flex flex-col min-h-screen;
+}
