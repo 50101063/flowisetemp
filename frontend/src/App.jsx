@@ -1,41 +1,61 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
-import RecipeListPage from './pages/RecipeListPage';
-import RecipeDetailPage from './pages/RecipeDetailPage';
-import RecipeFormPage from './pages/RecipeFormPage';
-import NotFoundPage from './pages/NotFoundPage';
-import PrivateRoute from './components/PrivateRoute';
-import Navbar from './components/Navbar';
+import { useAuth } from './context/AuthContext';
+import Header from './components/Header';
+import RecipeForm from './components/RecipeForm';
+import RecipeDetail from './components/RecipeDetail';
+
+function PrivateRoute({ children }) {
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated ? children : <Navigate to="/login" />;
+}
 
 function App() {
   return (
     <Router>
-      <AuthProvider>
-        <div className="App flex flex-col min-h-screen">
-          <Navbar />
-          <main className="flex-grow container mx-auto p-4">
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
-              
-              {/* Protected Routes */}
-              <Route element={<PrivateRoute />}>
-                <Route path="/recipes" element={<RecipeListPage />} />
-                <Route path="/recipes/:id" element={<RecipeDetailPage />} />
-                <Route path="/recipes/new" element={<RecipeFormPage />} />
-                <Route path="/recipes/edit/:id" element={<RecipeFormPage />} />
-              </Route>
-
-              {/* Catch-all route for 404 */} 
-              <Route path="*" element={<NotFoundPage />} />
-            </Routes>
-          </main>
-        </div>
-      </AuthProvider>
+      <Header />
+      <div className="container mx-auto p-4">
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route
+            path="/"
+            element={
+              <PrivateRoute>
+                <HomePage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/add-recipe"
+            element={
+              <PrivateRoute>
+                <RecipeForm />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/edit-recipe/:id"
+            element={
+              <PrivateRoute>
+                <RecipeForm />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/recipes/:id"
+            element={
+              <PrivateRoute>
+                <RecipeDetail />
+              </PrivateRoute>
+            }
+          />
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </div>
     </Router>
   );
 }
