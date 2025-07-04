@@ -1,56 +1,84 @@
-import api from './axiosConfig';
+const API_BASE_URL = 'http://localhost:8000'; // Replace with your backend URL
 
-// Get all recipes for the authenticated user
-export const getRecipes = async (searchQuery = '', category = '') => {
-  try {
-    const response = await api.get('/recipes', {
-      params: {
-        search: searchQuery,
-        category: category,
-      },
-    });
-    return response.data;
-  } catch (error) {
-    throw error.response?.data?.detail || 'Failed to fetch recipes';
-  }
+const getAuthHeaders = () => {
+  const token = localStorage.getItem('token');
+  return {
+    'Content-Type': 'application/json',
+    ...(token && { Authorization: `Bearer ${token}` }),
+  };
 };
 
-// Get a single recipe by ID
+export const getAllRecipes = async (searchTerm = '', category = '') => {
+  let url = `${API_BASE_URL}/recipes`;
+  const params = new URLSearchParams();
+
+  if (searchTerm) {
+    params.append('search', searchTerm);
+  }
+  if (category) {
+    params.append('category', category);
+  }
+
+  if (params.toString()) {
+    url += `?${params.toString()}`;
+  }
+
+  const response = await fetch(url, {
+    headers: getAuthHeaders(),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.detail || 'Failed to fetch recipes.');
+  }
+  return response.json();
+};
+
 export const getRecipeById = async (id) => {
-  try {
-    const response = await api.get(`/recipes/${id}`);
-    return response.data;
-  } catch (error) {
-    throw error.response?.data?.detail || 'Failed to fetch recipe';
+  const response = await fetch(`${API_BASE_URL}/recipes/${id}`, {
+    headers: getAuthHeaders(),
+  });
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.detail || 'Failed to fetch recipe.');
   }
+  return response.json();
 };
 
-// Create a new recipe
 export const createRecipe = async (recipeData) => {
-  try {
-    const response = await api.post('/recipes/', recipeData);
-    return response.data;
-  } catch (error) {
-    throw error.response?.data?.detail || 'Failed to create recipe';
+  const response = await fetch(`${API_BASE_URL}/recipes`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(recipeData),
+  });
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.detail || 'Failed to create recipe.');
   }
+  return response.json();
 };
 
-// Update an existing recipe
 export const updateRecipe = async (id, recipeData) => {
-  try {
-    const response = await api.put(`/recipes/${id}`, recipeData);
-    return response.data;
-  } catch (error) {
-    throw error.response?.data?.detail || 'Failed to update recipe';
+  const response = await fetch(`${API_BASE_URL}/recipes/${id}`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(recipeData),
+  });
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.detail || 'Failed to update recipe.');
   }
+  return response.json();
 };
 
-// Delete a recipe
 export const deleteRecipe = async (id) => {
-  try {
-    const response = await api.delete(`/recipes/${id}`);
-    return response.data;
-  } catch (error) {
-    throw error.response?.data?.detail || 'Failed to delete recipe';
+  const response = await fetch(`${API_BASE_URL}/recipes/${id}`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(),
+  });
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.detail || 'Failed to delete recipe.');
   }
+  return { message: 'Recipe deleted successfully.' };
 };
