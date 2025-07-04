@@ -1,88 +1,89 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import { RecipeContext } from '../context/RecipeContext';
-import { AuthContext } from '../context/AuthContext';
+import React, { useState, useEffect } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import api from '../api/api';
 
 const RecipeDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user } = useContext(AuthContext);
-  const { fetchRecipeById, removeRecipe, isLoading, error } = useContext(RecipeContext);
   const [recipe, setRecipe] = useState(null);
-  const [isPageLoading, setIsPageLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!user) {
-      navigate('/login');
-      return;
-    }
-
-    const getRecipe = async () => {
-      setIsPageLoading(true);
-      const fetchedRecipe = await fetchRecipeById(id);
-      if (fetchedRecipe) {
-        setRecipe(fetchedRecipe);
-      } else {
-        // Recipe not found or error, navigate to home
-        navigate('/');
+    const fetchRecipe = async () => {
+      try {
+        const response = await api.get(`/recipes/${id}`);
+        setRecipe(response.data);
+      } catch (err) {
+        setError("Failed to fetch recipe. It might not exist or you don't have permission.");
+        console.error("Error fetching recipe:", err);
+      } finally {
+        setLoading(false);
       }
-      setIsPageLoading(false);
     };
-    getRecipe();
-  }, [id, user, navigate, fetchRecipeById]);
+    fetchRecipe();
+  }, [id]);
 
   const handleDelete = async () => {
-    if (window.confirm('Are you sure you want to delete this recipe?')) {
-      const success = await removeRecipe(id);
-      if (success) {
-        navigate('/');
+    if (window.confirm("Are you sure you want to delete this recipe?")) {
+      try {
+        await api.delete(`/recipes/${id}`);
+        alert("Recipe deleted successfully!");
+        navigate('/recipes');
+      } catch (err) {
+        setError("Failed to delete recipe.");
+        console.error("Error deleting recipe:", err);
       }
     }
   };
 
-  if (isPageLoading) {
+  if (loading) {
     return <div className="text-center text-lg mt-8">Loading recipe...</div>;
   }
 
+  if (error) {
+    return <div className="text-center text-red-500 text-lg mt-8">Error: {error}</div>;
+  }
+
   if (!recipe) {
-    return <div className="text-center text-lg mt-8 text-red-500">Recipe not found.</div>; // Should be caught by navigate, but as a fallback
+    return <div className="text-center text-lg mt-8">Recipe not found.</div>;
   }
 
   return (
-    <div className="bg-white p-8 rounded-lg shadow-md max-w-3xl mx-auto my-8">
-      <h1 className="text-4xl font-bold text-blue-800 mb-4 text-center">{recipe.name}</h1>
-      <p className="text-gray-600 text-lg mb-6 text-center">Category: <span className="font-semibold text-blue-600">{recipe.category}</span></p>
+    <div className="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-md mt-8">
+      <h1 className="text-3xl font-bold text-gray-800 mb-4">{recipe.name}</h1>
+      <p className="text-sm text-gray-500 mb-6">Category: <span className="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded">{recipe.category || 'Uncategorized'}</span></p>
+      
+      <div className="mb-6">
+        <h2 className="text-xl font-semibold text-gray-700 mb-2">Ingredients:</h2>
+        <p className="text-gray-700 whitespace-pre-line">{recipe.ingredients}</p>
+      </div>
 
       <div className="mb-6">
-        <h2 className="text-2xl font-semibold text-gray-700 mb-3">Ingredients:</h2>
-        <div className="prose max-w-none">
-          <p className="whitespace-pre-wrap text-gray-800 leading-relaxed">{recipe.ingredients}</p>
-        </div>
+        <h2 className="text-xl font-semibold text-gray-700 mb-2">Instructions:</h2>
+        <p className="text-gray-700 whitespace-pre-line">{recipe.instructions}</p>
       </div>
 
-      <div className="mb-8">
-        <h2 className="text-2xl font-semibold text-gray-700 mb-3">Instructions:</h2>
-        <div className="prose max-w-none">
-          <p className="whitespace-pre-wrap text-gray-800 leading-relaxed">{recipe.instructions}</p>
-        </div>
-      </div>
-
-      <div className="flex justify-center space-x-4">
-        <Link
-          to={`/recipes/${recipe.id}/edit`}
-          className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-5 rounded transition duration-200"
+      <div className="flex space-x-4 mt-6">
+        <Link 
+          to={`/recipes/edit/${recipe.id}`}
+          className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
         >
-          Edit
+          Edit Recipe
         </Link>
         <button
           onClick={handleDelete}
-          className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-5 rounded transition duration-200"
-          disabled={isLoading}
+          className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
         >
-          {isLoading ? 'Deleting...' : 'Delete'}
+          Delete Recipe
         </button>
+        <Link 
+          to="/recipes"
+          className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+        >
+          Back to List
+        </Link>
       </div>
-      {error && <p className="text-red-500 text-center mt-4">Error: {error}</p>}
     </div>
   );
 };
