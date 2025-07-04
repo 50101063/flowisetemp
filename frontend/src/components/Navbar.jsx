@@ -1,41 +1,27 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
+import React from 'react';
+import { Link } from 'react-router-dom';
 
-function Navbar() {
-  const { user, logout } = useAuth()
-
+const Navbar = () => {
   return (
-    <nav className="bg-blue-600 p-4 text-white shadow-md">
+    <nav className="bg-gray-800 p-4">
       <div className="container mx-auto flex justify-between items-center">
-        <Link to="/" className="text-2xl font-bold">
+        <Link to="/" className="text-white text-2xl font-bold">
           Recipe Organizer
         </Link>
-        <div>
-          {user ? (
-            <> 
-              <span className="mr-4">Hello, {user.username}</span>
-              <button
-                onClick={logout}
-                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-              >
-                Logout
-              </button>
-            </>
-          ) : (
-            <>
-              <Link to="/login" className="mr-4 hover:underline">
-                Login
-              </Link>
-              <Link to="/register" className="hover:underline">
-                Register
-              </Link>
-            </>
-          )}
+        <div className="space-x-4">
+          <Link to="/recipes" className="text-gray-300 hover:text-white">
+            Recipes
+          </Link>
+          <Link to="/login" className="text-gray-300 hover:text-white">
+            Login
+          </Link>
+          <Link to="/register" className="text-gray-300 hover:text-white">
+            Register
+          </Link>
         </div>
       </div>
     </nav>
-  )
-}
+  );
+};
 
-export default Navbar
+export default Navbar;
