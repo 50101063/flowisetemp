@@ -1,98 +1,84 @@
 # Personal Recipe Card Organizer - Frontend
 
-This directory contains the frontend application for the Personal Recipe Card Organizer, built with React, Vite, and Tailwind CSS.
+This repository contains the frontend application for the Personal Recipe Card Organizer, built with React, Vite, and Tailwind CSS.
+
+## Table of Contents
+
+- [Features](#features)
+- [Technologies Used](#technologies-used)
+- [Setup and Installation](#setup-and-installation)
+- [Running the Application](#running-the-application)
+- [Project Structure](#project-structure)
+- [Contributing](#contributing)
+- [License](#license)
+
+## Features
+
+- User authentication (Login, Register, Logout)
+- View, Add, Edit, Delete recipes
+- Search recipes by name or ingredients
+- Filter recipes by category
+- Responsive design for various screen sizes
 
 ## Technologies Used
 
-*   **React 18.x:** A JavaScript library for building user interfaces.
-*   **Vite 5.x:** A fast build tool that provides a lightning-fast development experience.
-*   **Tailwind CSS 3.x:** A utility-first CSS framework for rapidly building custom designs.
-*   **React Router DOM 6.x:** For declarative routing in React applications.
-*   **Context API:** For state management.
+- **React 18.x**: JavaScript library for building user interfaces.
+- **Vite 5.x**: Next-generation frontend tooling for fast development.
+- **Tailwind CSS 3.x**: A utility-first CSS framework for rapid UI development.
+- **React Router DOM 6.x**: For declarative routing in React applications.
+- **Context API**: For simple global state management.
+
+## Setup and Installation
+
+Follow these steps to set up and run the frontend application locally:
+
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/50101063/flowisetemp.git
+    cd flowisetemp/frontend
+    ```
+
+2.  **Install dependencies:**
+    Navigate to the `frontend` directory and install the required Node.js packages:
+    ```bash
+    cd frontend
+    npm install
+    ```
+
+## Running the Application
+
+To start the development server:
+
+```bash
+npm run dev
+```
+
+The application will typically be available at `http://localhost:5173`.
 
 ## Project Structure
 
 ```
 frontend/
-├── public/
-│   └── index.html             # Main HTML file
-├── src/
-│   ├── api/                   # API interaction logic
-│   ├── components/            # Reusable UI components
-│   ├── context/               # React Context for global state
-│   ├── pages/                 # Page-level components (views)
-│   ├── App.jsx                # Main application component
-│   ├── index.css              # Global styles (Tailwind base, components, utilities)
-│   └── main.jsx               # Entry point for the React application
-├── .gitignore                 # Git ignore file for frontend
-├── package.json               # Project dependencies and scripts
-├── postcss.config.js          # PostCSS configuration for Tailwind CSS
-├── tailwind.config.js         # Tailwind CSS configuration
-└── vite.config.js             # Vite build configuration
-└── README.md                  # This file
+├── public/                # Static assets (e.g., index.html)
+├── src/                   # Source code
+│   ├── assets/            # Images, icons, etc.
+│   ├── components/        # Reusable UI components
+│   ├── context/           # React Context API for global state
+│   ├── App.jsx            # Main application component
+│   ├── main.jsx           # Entry point for the React application
+│   └── index.css          # Global CSS (Tailwind directives)
+├── .gitignore             # Git ignore rules
+├── package.json           # Project dependencies and scripts
+├── postcss.config.js      # PostCSS configuration for Tailwind CSS
+├── tailwind.config.js     # Tailwind CSS configuration
+├── vite.config.js         # Vite build configuration
+└── README.md              # This file
 ```
-
-## Setup and Running the Application
-
-To get the frontend application up and running on your local machine, follow these steps:
-
-### Prerequisites
-
-*   Node.js (LTS version recommended, e.g., 18.x or 20.x)
-*   npm or yarn (npm is included with Node.js)
-
-### Installation
-
-1.  **Navigate to the frontend directory:**
-    ```bash
-    cd frontend
-    ```
-
-2.  **Install dependencies:**
-    ```bash
-    npm install
-    # OR
-    yarn install
-    ```
-
-### Running in Development Mode
-
-To start the development server with hot-reloading:
-
-```bash
-npm run dev
-# OR
-yarn dev
-```
-
-This will typically start the application on `http://localhost:5173` (or another available port). The console will show the exact URL.
-
-### Building for Production
-
-To create a production-ready build of the application:
-
-```bash
-npm run build
-# OR
-yarn build
-```
-
-This command will compile and optimize your code into the `dist/` directory, ready for deployment.
-
-### Previewing the Production Build
-
-You can locally preview the production build:
-
-```bash
-npm run preview
-# OR
-yarn preview
-```
-
-## API Integration
-
-The application will communicate with the backend API. Ensure the backend server is running and accessible. API endpoints are configured in `src/api/` files. You might need to adjust the base URL for API calls depending on your backend deployment.
 
 ## Contributing
 
-Please refer to the main project's `CONTRIBUTING.md` (if available) for contribution guidelines.
+Please refer to the main repository's `CONTRIBUTING.md` for contribution guidelines.
+
+## License
+
+This project is licensed under the MIT License. See the `LICENSE` file in the main repository for details.
