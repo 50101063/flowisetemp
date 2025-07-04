@@ -1,44 +1,80 @@
-import React, { useContext, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
-import AuthForm from '../components/AuthForm';
+import React, { useState } from 'react'
+import { useAuth } from '../context/AuthContext'
+import { useNavigate } from 'react-router-dom'
 
-const RegisterPage = () => {
-  const { user, register, isLoading, error } = useContext(AuthContext);
-  const navigate = useNavigate();
-  const [successMessage, setSuccessMessage] = useState(null);
+function RegisterPage() {
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const { register } = useAuth()
+  const navigate = useNavigate()
 
-  useEffect(() => {
-    if (user) {
-      navigate('/'); // Redirect to home if already logged in
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    if (password !== confirmPassword) {
+      alert("Passwords do not match!")
+      return
     }
-  }, [user, navigate]);
-
-  const handleRegister = async (username, password) => {
-    setSuccessMessage(null);
-    const success = await register(username, password);
-    if (success) {
-      setSuccessMessage('Registration successful! Please log in.');
-      // Optionally, navigate to login page after a short delay
-      setTimeout(() => navigate('/login'), 2000);
-    }
-  };
+    // In a real app, you'd send this to your backend for registration
+    register({ username, password })
+    navigate('/') // Redirect to home after mock registration/login
+  }
 
   return (
-    <div className="flex justify-center items-center min-h-screen-minus-navbar py-8">
-      <AuthForm
-        type="Register"
-        onSubmit={handleRegister}
-        isLoading={isLoading}
-        error={error}
-      />
-      {successMessage && (
-        <p className="text-green-500 text-center mt-4 absolute bottom-4 left-1/2 -translate-x-1/2 bg-white p-3 rounded shadow-lg">
-          {successMessage}
-        </p>
-      )}
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <div className="px-8 py-6 mt-4 text-left bg-white shadow-lg rounded-lg w-full max-w-md">
+        <h3 className="text-2xl font-bold text-center">Register for an account</h3>
+        <form onSubmit={handleSubmit}>
+          <div className="mt-4">
+            <div>
+              <label className="block" htmlFor="username">Username</label>
+              <input
+                type="text"
+                placeholder="Username"
+                id="username"
+                className="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+              />
+            </div>
+            <div className="mt-4">
+              <label className="block" htmlFor="password">Password</label>
+              <input
+                type="password"
+                placeholder="Password"
+                id="password"
+                className="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+            <div className="mt-4">
+              <label className="block" htmlFor="confirmPassword">Confirm Password</label>
+              <input
+                type="password"
+                placeholder="Confirm Password"
+                id="confirmPassword"
+                className="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+              />
+            </div>
+            <div className="flex items-baseline justify-between">
+              <button
+                type="submit"
+                className="px-6 py-2 mt-4 text-white bg-blue-600 rounded-lg hover:bg-blue-900"
+              >
+                Register
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
     </div>
-  );
-};
+  )
+}
 
-export default RegisterPage;
+export default RegisterPage
