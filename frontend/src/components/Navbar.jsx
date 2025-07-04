@@ -12,45 +12,24 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-blue-600 p-4 text-white shadow-md">
+    <nav className="bg-gray-800 p-4 text-white">
       <div className="container mx-auto flex justify-between items-center">
-        <Link to="/" className="text-2xl font-bold hover:text-blue-200 transition-colors">
-          Recipe Organizer
-        </Link>
+        <Link to="/" className="text-xl font-bold">Recipe Organizer</Link>
         <ul className="flex space-x-4">
+          <li><Link to="/" className="hover:text-gray-300">Home</Link></li>
           {user ? (
             <>
+              <li><Link to="/recipes" className="hover:text-gray-300">Recipes</Link></li>
               <li>
-                <Link to="/recipes" className="hover:text-blue-200 transition-colors">
-                  My Recipes
-                </Link>
-              </li>
-              <li>
-                <Link to="/recipes/new" className="hover:text-blue-200 transition-colors">
-                  Add Recipe
-                </Link>
-              </li>
-              <li>
-                <button
-                  onClick={handleLogout}
-                  className="bg-blue-700 hover:bg-blue-800 text-white font-bold py-1 px-3 rounded-md transition-colors"
-                >
+                <button onClick={handleLogout} className="hover:text-gray-300 focus:outline-none">
                   Logout ({user.username})
                 </button>
               </li>
             </>
           ) : (
             <>
-              <li>
-                <Link to="/login" className="hover:text-blue-200 transition-colors">
-                  Login
-                </Link>
-              </li>
-              <li>
-                <Link to="/register" className="hover:text-blue-200 transition-colors">
-                  Register
-                </Link>
-              </li>
+              <li><Link to="/login" className="hover:text-gray-300">Login</Link></li>
+              <li><Link to="/register" className="hover:text-gray-300">Register</Link></li>
             </>
           )}
         </ul>
