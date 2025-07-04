@@ -1,98 +1,139 @@
 # Personal Recipe Card Organizer - Backend
 
-This folder contains the backend services for the Personal Recipe Card Organizer application, built with FastAPI, Python, and PostgreSQL.
+This folder contains the backend services for the Personal Recipe Card Organizer web application. The backend is built with Python using the FastAPI framework, SQLAlchemy for ORM, and PostgreSQL as the database. It provides RESTful API endpoints for user authentication, recipe management (CRUD), searching, and filtering.
 
 ## Technologies Used
 
-*   **Python 3.10+**
-*   **FastAPI 0.100+**: Web framework for building APIs.
-*   **SQLAlchemy**: ORM for interacting with PostgreSQL.
-*   **Pydantic**: For data validation and serialization.
-*   **python-jose[cryptography]**: For JWT authentication.
-*   **Bcrypt**: For password hashing.
-*   **Uvicorn**: ASGI server to run FastAPI.
-*   **Psycopg2-binary**: PostgreSQL adapter for Python.
+*   **Language:** Python 3.10+
+*   **Web Framework:** FastAPI 0.100+
+*   **Database:** PostgreSQL 15.x
+*   **ORM:** SQLAlchemy
+*   **Authentication:** JWT (JSON Web Tokens)
+*   **Password Hashing:** `bcrypt` via `passlib`
+*   **Environment Management:** `python-dotenv`
+
+## Project Structure
+
+```
+backend/
+├── main.py             # Main FastAPI application, defines API routes
+├── database.py         # SQLAlchemy engine, session management, and base
+├── models.py           # SQLAlchemy ORM models (User, Recipe)
+├── schemas.py          # Pydantic models for request/response validation
+├── auth.py             # Authentication utilities (JWT, password hashing, current user dependency)
+├── crud.py             # Database interaction functions (CRUD operations)
+├── requirements.txt    # Python dependencies
+└── README.md           # This file
+```
 
 ## Setup Instructions
 
-1.  **Clone the repository:**
-    ```bash
-    git clone https://github.com/50101063/flowisetemp.git
-    cd flowisetemp/backend
-    ```
+Follow these steps to set up and run the backend locally:
 
-2.  **Create a Python virtual environment and activate it:**
-    ```bash
-    python -m venv venv
-    # On Windows
-    .\venv\Scripts\activate
-    # On macOS/Linux
-    source venv/bin/activate
-    ```
+### 1. Prerequisites
 
-3.  **Install dependencies:**
-    ```bash
-    pip install -r requirements.txt
-    ```
+*   Python 3.10 or higher
+*   PostgreSQL 15.x installed and running
+*   `pip` (Python package installer)
 
-4.  **Database Setup (PostgreSQL):**
-    *   Ensure you have a PostgreSQL server running.
-    *   Create a database (e.g., `recipe_organizer_db`).
-    *   Create a user with appropriate permissions.
-    *   Update the database connection string in `main.py` or set it via environment variables (recommended for production).
-        Example `DATABASE_URL`: `postgresql://user:password@host:port/database_name`
+### 2. Clone the Repository
 
-5.  **Environment Variables:**
-    Create a `.env` file in the `backend/` directory with the following variables:
-    ```
-    DATABASE_URL="postgresql://user:password@host:5432/recipe_organizer_db"
-    SECRET_KEY="your-super-secret-key" # Generate a strong random key
-    ALGORITHM="HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES=30
-    ```
+If you haven't already, clone the main project repository:
 
-    *   `DATABASE_URL`: Your PostgreSQL connection string.
-    *   `SECRET_KEY`: A strong secret key used for JWT encoding. You can generate one using `openssl rand -hex 32`.
-    *   `ALGORITHM`: The algorithm used for JWT signing (e.g., HS256).
-    *   `ACCESS_TOKEN_EXPIRE_MINUTES`: How long the access token is valid.
+```bash
+git clone https://github.com/50101063/flowisetemp.git
+cd flowisetemp
+```
 
-## Running the Application
+### 3. Navigate to the Backend Directory
 
-1.  **Activate your virtual environment** (if not already active).
-2.  **Navigate to the `backend/` directory.**
-3.  **Run the FastAPI application using Uvicorn:**
-    ```bash
-    uvicorn main:app --host 0.0.0.0 --port 8000 --reload
-    ```
-    The `--reload` flag is useful for development as it restarts the server on code changes.
+```bash
+cd backend
+```
 
-4.  **Access the API Documentation:**
-    Once the server is running, you can access the interactive API documentation (Swagger UI) at:
-    `http://127.0.0.1:8000/docs`
-    or ReDoc at:
-    `http://127.0.0.1:8000/redoc`
+### 4. Create a Virtual Environment (Recommended)
 
-## API Endpoints
+It's good practice to use a virtual environment to manage dependencies:
 
-The API provides the following endpoints:
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
 
-### User Management
-*   `POST /register`: Register a new user.
-*   `POST /token`: Authenticate user and get an access token.
+### 5. Install Dependencies
 
-### Recipe Management (Requires Authentication)
-*   `POST /recipes/`: Create a new recipe.
-*   `GET /recipes/`: Retrieve all recipes for the logged-in user.
-*   `GET /recipes/{recipe_id}`: Retrieve a single recipe by ID.
-*   `PUT /recipes/{recipe_id}`: Update an existing recipe.
-*   `DELETE /recipes/{recipe_id}`: Delete a recipe.
-*   `GET /recipes/search`: Search recipes by name or ingredients.
-*   `GET /recipes/filter`: Filter recipes by category.
+Install the required Python packages:
+
+```bash
+pip install -r requirements.txt
+```
+
+### 6. Database Setup
+
+Ensure your PostgreSQL server is running.
+
+**A. Create a Database:**
+
+Create a new database for the application. You can do this via `psql` or a GUI tool like pgAdmin:
+
+```sql
+CREATE DATABASE recipe_organizer_db;
+```
+
+**B. Environment Variables:**
+
+Create a `.env` file in the `backend/` directory with your database connection string and a secret key for JWTs. Replace the placeholders with your actual database credentials:
+
+```dotenv
+DATABASE_URL="postgresql://user:password@host:port/recipe_organizer_db"
+SECRET_KEY="your_super_secret_jwt_key_here" # Use a strong, random key
+ALGORITHM="HS256" # JWT algorithm
+ACCESS_TOKEN_EXPIRE_MINUTES=30 # JWT expiry time
+```
+
+**Example `DATABASE_URL`:**
+`postgresql://postgres:mysecretpassword@localhost:5432/recipe_organizer_db`
+
+**C. Apply Migrations (Initial Schema Creation):**
+
+The `database.py` file contains the `Base.metadata.create_all(engine)` call. When you run `main.py` for the first time, it will create the tables defined in `models.py` if they don't already exist.
+
+### 7. Run the Backend Application
+
+```bash
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
+```
+
+*   `uvicorn main:app`: Tells Uvicorn to run the `app` object from `main.py`.
+*   `--reload`: Automatically reloads the server when code changes are detected (useful for development).
+*   `--host 0.0.0.0`: Makes the server accessible from other devices on your network (for development purposes).
+*   `--port 8000`: Runs the server on port 8000.
+
+You should see output indicating that the FastAPI application is running.
+
+### 8. Access the API Documentation
+
+Once the server is running, you can access the interactive API documentation (Swagger UI) at:
+
+`http://localhost:8000/docs`
+
+Or ReDoc at:
+
+`http://localhost:8000/redoc`
+
+This documentation allows you to test the API endpoints directly.
 
 ## Integration with Frontend
 
-The frontend application (likely running on a different port/domain) will interact with this backend API. Ensure Cross-Origin Resource Sharing (CORS) is correctly configured in `main.py` if your frontend is served from a different origin than your backend.
+The backend exposes RESTful API endpoints. The frontend application (developed with React) will make HTTP requests to these endpoints to perform user authentication and recipe management operations.
 
-## Database Schema
+**Base API URL:** `http://localhost:8000/api/v1` (adjust if you change the port or host)
 
-Refer to the `database/schema.sql` file in the `database/` folder for the detailed database schema (Users and Recipes tables).
+Ensure your frontend is configured to point to the correct backend URL.
+
+## Security Considerations
+
+*   **Secret Key:** Keep your `SECRET_KEY` in the `.env` file secure and never commit it to version control. Generate a strong, random key for production.
+*   **Password Hashing:** Passwords are hashed using `bcrypt` before storage.
+*   **HTTPS:** In a production environment, ensure the backend is served over HTTPS to encrypt all communication.
+*   **CORS:** Cross-Origin Resource Sharing (CORS) is enabled in `main.py` to allow the frontend (running on a different origin) to communicate with the backend. Adjust `allow_origins` in `main.py` for production.
