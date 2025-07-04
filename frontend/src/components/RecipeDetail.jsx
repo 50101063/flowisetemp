@@ -1,90 +1,71 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import { getRecipeById, deleteRecipe } from '../api/recipeApi';
-import { useAuth } from '../context/AuthContext';
+import React from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 
-function RecipeDetail() {
+const RecipeDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { logout } = useAuth();
-  const [recipe, setRecipe] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchRecipe = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const data = await getRecipeById(id);
-        setRecipe(data);
-      } catch (err) {
-        setError(err.message);
-        if (err.message === 'Not authenticated' || err.message === 'Token invalid') {
-          logout();
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchRecipe();
-  }, [id, logout]);
+  // Placeholder for fetching recipe details based on ID
+  // In a real application, you would fetch data from an API
+  const recipe = {
+    id: id,
+    name: `Sample Recipe ${id}`,
+    ingredients: `Ingredient 1, Ingredient 2, Ingredient 3`,
+    instructions: `Step 1: Do something. Step 2: Do something else. Step 3: Enjoy!`,
+    category: 'Dinner',
+  };
 
-  const handleDelete = async () => {
-    if (window.confirm('Are you sure you want to delete this recipe?')) {
-      try {
-        await deleteRecipe(id);
-        navigate('/recipes'); // Redirect to recipe list after deletion
-      } catch (err) {
-        setError(err.message);
-        if (err.message === 'Not authenticated' || err.message === 'Token invalid') {
-          logout();
-        }
-      }
+  if (!recipe) {
+    return <div className="p-4 text-center text-red-500">Recipe not found.</div>;
+  }
+
+  const handleDelete = () => {
+    if (window.confirm(`Are you sure you want to delete "${recipe.name}"?`)) {
+      // Simulate delete API call
+      alert(`Recipe "${recipe.name}" deleted! (Simulated)`);
+      navigate('/recipes'); // Redirect to recipe list after deletion
     }
   };
 
-  if (loading) return <div className="text-center text-gray-600">Loading recipe details...</div>;
-  if (error) return <div className="text-center text-red-500">Error: {error}</div>;
-  if (!recipe) return <div className="text-center text-gray-600">Recipe not found.</div>;
-
   return (
-    <div className="w-full max-w-2xl p-8 space-y-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-3xl font-bold text-gray-900 mb-4">{recipe.name}</h2>
-      <p className="text-lg text-gray-700 mb-2"><strong>Category:</strong> {recipe.category || 'N/A'}</p>
-      
-      <div className="bg-gray-50 p-4 rounded-md">
-        <h3 className="text-xl font-semibold text-gray-800 mb-2">Ingredients:</h3>
-        <p className="text-gray-700 whitespace-pre-wrap">{recipe.ingredients}</p>
-      </div>
+    <div className="container mx-auto p-4">
+      <div className="bg-white shadow-md rounded-lg p-6">
+        <h2 className="text-3xl font-bold text-gray-800 mb-4">{recipe.name}</h2>
+        <p className="text-sm text-gray-600 mb-4">Category: <span className="font-semibold">{recipe.category}</span></p>
 
-      <div className="bg-gray-50 p-4 rounded-md">
-        <h3 className="text-xl font-semibold text-gray-800 mb-2">Instructions:</h3>
-        <p className="text-gray-700 whitespace-pre-wrap">{recipe.instructions}</p>
-      </div>
+        <div className="mb-6">
+          <h3 className="text-xl font-semibold text-gray-700 mb-2">Ingredients:</h3>
+          <p className="text-gray-700 whitespace-pre-line">{recipe.ingredients}</p>
+        </div>
 
-      <div className="flex flex-col sm:flex-row gap-4 mt-6">
-        <Link
-          to={`/recipes/edit/${recipe.id}`}
-          className="flex-1 text-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-        >
-          Edit Recipe
-        </Link>
-        <button
-          onClick={handleDelete}
-          className="flex-1 text-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-        >
-          Delete Recipe
-        </button>
-        <Link
-          to="/recipes"
-          className="flex-1 text-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-        >
-          Back to List
-        </Link>
+        <div className="mb-6">
+          <h3 className="text-xl font-semibold text-gray-700 mb-2">Instructions:</h3>
+          <p className="text-gray-700 whitespace-pre-line">{recipe.instructions}</p>
+        </div>
+
+        <div className="flex flex-wrap gap-4 mt-6">
+          <Link
+            to={`/edit-recipe/${recipe.id}`}
+            className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition duration-300"
+          >
+            Edit Recipe
+          </Link>
+          <button
+            onClick={handleDelete}
+            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-300"
+          >
+            Delete Recipe
+          </button>
+          <Link
+            to="/recipes"
+            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition duration-300"
+          >
+            Back to Recipes
+          </Link>
+        </div>
       </div>
     </div>
   );
-}
+};
 
 export default RecipeDetail;
