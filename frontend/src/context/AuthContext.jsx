@@ -1,65 +1,68 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
-import { loginUser, registerUser } from '../api/recipeApi';
-import { useNavigate } from 'react-router-dom';
+import React, { createContext, useState, useEffect } from 'react';
+import api from '../api/api';
 
-const AuthContext = createContext(null);
+const AuthContext = createContext();
 
-export const AuthProvider = ({ children }) => {
+const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem('token'));
-  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (token) {
-      // In a real app, you'd validate the token with a backend call
-      // For this MVP, we assume a stored token is valid until logout
-      // You might also decode JWT to get user info if needed
-      setUser({ username: localStorage.getItem('username') }); // Store username too
-    } else {
-      setUser(null);
-    }
-  }, [token]);
+    const loadUser = () => {
+      try {
+        const storedUser = localStorage.getItem('user');
+        const token = localStorage.getItem('token');
+        if (storedUser && token) {
+          setUser(JSON.parse(storedUser));
+          // Potentially validate token with backend here if needed
+        }
+      } catch (error) {
+        console.error("Failed to load user from localStorage", error);
+        localStorage.clear(); // Clear invalid data
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadUser();
+  }, []);
 
   const login = async (username, password) => {
     try {
-      const data = await loginUser(username, password);
-      localStorage.setItem('token', data.access_token);
-      localStorage.setItem('username', username); // Store username
-      setToken(data.access_token);
-      setUser({ username });
-      navigate('/recipes');
+      const response = await api.post('/auth/login', { username, password });
+      const { access_token, user: userData } = response.data;
+      localStorage.setItem('token', access_token);
+      localStorage.setItem('user', JSON.stringify(userData));
+      setUser(userData);
       return { success: true };
     } catch (error) {
-      console.error('Login error:', error);
-      return { success: false, message: error.message };
+      console.error("Login failed:", error.response?.data || error.message);
+      return { success: false, message: error.response?.data?.detail || "Login failed" };
     }
   };
 
   const register = async (username, password) => {
     try {
-      const data = await registerUser(username, password);
-      // After successful registration, automatically log them in or redirect to login
-      await login(username, password); // Auto-login after registration
-      return { success: true };
+      const response = await api.post('/auth/register', { username, password });
+      // After successful registration, you might want to automatically log them in
+      // For now, just return success and let them navigate to login
+      return { success: true, message: response.data.message || "Registration successful!" };
     } catch (error) {
-      console.error('Registration error:', error);
-      return { success: false, message: error.message };
+      console.error("Registration failed:", error.response?.data || error.message);
+      return { success: false, message: error.response?.data?.detail || "Registration failed" };
     }
   };
 
   const logout = () => {
     localStorage.removeItem('token');
-    localStorage.removeItem('username');
-    setToken(null);
+    localStorage.removeItem('user');
     setUser(null);
-    navigate('/login');
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, register, logout }}>
-      {children}
+    <AuthContext.Provider value={{ user, login, register, logout, loading }}>
+      {!loading && children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export { AuthContext, AuthProvider };
