@@ -1,41 +1,41 @@
-import React, { useContext } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
+import React from 'react'
+import { Link } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 
-const Navbar = () => {
-  const { user, logout } = useContext(AuthContext);
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
+function Navbar() {
+  const { user, logout } = useAuth()
 
   return (
-    <nav className="bg-gray-800 p-4 text-white">
+    <nav className="bg-blue-600 p-4 text-white shadow-md">
       <div className="container mx-auto flex justify-between items-center">
-        <Link to="/" className="text-xl font-bold">Recipe Organizer</Link>
-        <ul className="flex space-x-4">
-          <li><Link to="/" className="hover:text-gray-300">Home</Link></li>
+        <Link to="/" className="text-2xl font-bold">
+          Recipe Organizer
+        </Link>
+        <div>
           {user ? (
-            <>
-              <li><Link to="/recipes" className="hover:text-gray-300">Recipes</Link></li>
-              <li>
-                <button onClick={handleLogout} className="hover:text-gray-300 focus:outline-none">
-                  Logout ({user.username})
-                </button>
-              </li>
+            <> 
+              <span className="mr-4">Hello, {user.username}</span>
+              <button
+                onClick={logout}
+                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+              >
+                Logout
+              </button>
             </>
           ) : (
             <>
-              <li><Link to="/login" className="hover:text-gray-300">Login</Link></li>
-              <li><Link to="/register" className="hover:text-gray-300">Register</Link></li>
+              <Link to="/login" className="mr-4 hover:underline">
+                Login
+              </Link>
+              <Link to="/register" className="hover:underline">
+                Register
+              </Link>
             </>
           )}
-        </ul>
+        </div>
       </div>
     </nav>
-  );
-};
+  )
+}
 
-export default Navbar;
+export default Navbar
