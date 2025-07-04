@@ -1,113 +1,111 @@
-# Online Course Registration System Frontend
+# Personal Recipe Card Organizer - Frontend
 
-This is the frontend application for the Online Course Registration System, built with React and Vite.
+This is the frontend application for the Personal Recipe Card Organizer, built with React, Vite, and Tailwind CSS. It provides a user interface for managing personal recipes, including authentication, recipe listing, creation, editing, deletion, search, and filtering.
 
 ## Technologies Used
 
-*   **React 18+**: A JavaScript library for building user interfaces.
-*   **Vite 4+**: A fast build tool that provides a lightning-fast development experience.
-*   **React Query**: For efficient data fetching, caching, and synchronization with server state.
-*   **Zustand**: A small, fast, and scalable bearbones state-management solution (used for minimal global state if needed).
-*   **HTML, CSS (with potential for Tailwind CSS)**: Standard web technologies for structure and styling.
+*   **React 18.x:** A JavaScript library for building user interfaces.
+*   **Vite 5.x:** A fast build tool that provides an excellent development experience.
+*   **Tailwind CSS 3.x:** A utility-first CSS framework for rapidly building custom designs.
+*   **React Router DOM 6.x:** For declarative routing in React applications.
+*   **Context API & useState/useReducer:** For state management.
+
+## Setup Instructions
+
+To get this frontend application up and running on your local machine, follow these steps:
+
+### Prerequisites
+
+*   Node.js (LTS version recommended, e.g., 18.x or 20.x)
+*   npm or yarn (npm is included with Node.js)
+
+### Installation
+
+1.  **Clone the repository:**
+    Since this is part of a larger repository, navigate to the `frontend` directory after cloning the main project.
+    ```bash
+    git clone https://github.com/50101063/flowisetemp.git
+    cd flowisetemp/frontend
+    ```
+2.  **Install dependencies:**
+    ```bash
+    npm install
+    # or
+    yarn install
+    ```
+
+### Configuration
+
+Create a `.env` file in the `frontend/` directory (at the same level as `package.json`). This file will store environment variables, such as the backend API URL.
+
+```dotenv
+VITE_API_BASE_URL=http://localhost:8000/api
+```
+**Note:** The backend API URL (`http://localhost:8000/api`) is a placeholder. You will need to replace this with the actual URL of your deployed or local backend API.
+
+## Running the Application
+
+1.  **Start the development server:**
+    ```bash
+    npm run dev
+    # or
+    yarn dev
+    ```
+    The application will typically be accessible at `http://localhost:5173` (or another port if 5173 is in use).
+
+2.  **Open in your browser:**
+    Navigate to the URL provided by Vite in your terminal.
+
+## Key Features
+
+*   User Registration and Login
+*   Display a list of personal recipes
+*   Add, View, Edit, and Delete recipes
+*   Search recipes by name or ingredients
+*   Filter recipes by category/tag
+*   Responsive design for various screen sizes
 
 ## Project Structure
 
 ```
 frontend/
-├── public/             # Static assets (e.g., vite.svg)
+├── public/
+│   └── index.html             # Main HTML file
 ├── src/
-│   ├── assets/         # Images, icons, etc.
-│   ├── components/     # Reusable UI components
-│   ├── pages/          # Top-level components for different views/routes
-│   ├── services/       # API interaction logic (e.g., axios instances, React Query hooks)
-│   ├── store/          # Zustand store definitions (if global state is needed)
-│   ├── App.css         # Main application CSS
-│   ├── App.jsx         # Main application component
-│   ├── index.css       # Global styles
-│   └── main.jsx        # Entry point for the React application
-├── index.html          # Main HTML file
-├── package.json        # Project dependencies and scripts
-├── README.md           # This file
-└── vite.config.js      # Vite configuration
+│   ├── api/                   # API service functions
+│   │   ├── auth.js
+│   │   └── recipes.js
+│   ├── assets/                # Static assets (images, icons)
+│   ├── components/            # Reusable UI components
+│   │   ├── AuthForm.jsx
+│   │   ├── RecipeCard.jsx
+│   │   ├── RecipeForm.jsx
+│   │   ├── SearchFilter.jsx
+│   │   └── Navbar.jsx
+│   ├── context/               # React Context for global state
+│   │   ├── AuthContext.jsx
+│   │   └── RecipeContext.jsx
+│   ├── pages/                 # Page-level components (routes)
+│   │   ├── HomePage.jsx
+│   │   ├── LoginPage.jsx
+│   │   ├── RegisterPage.jsx
+│   │   ├── RecipeDetailPage.jsx
+│   │   └── AddEditRecipePage.jsx
+│   ├── App.jsx                # Main application component and router setup
+│   ├── main.jsx               # Entry point for React application
+│   └── index.css              # Tailwind CSS imports and global styles
+├── .env                       # Environment variables
+├── package.json               # Project dependencies and scripts
+├── tailwind.config.js         # Tailwind CSS configuration
+├── postcss.config.js          # PostCSS configuration
+└── README.md                  # This file
 ```
 
-## Setup and Running the Application
+## Dummy Data & API Simulation
 
-Follow these steps to get the frontend application up and running on your local machine.
-
-### Prerequisites
-
-*   Node.js (LTS version recommended, e.g., 18.x or 20.x)
-*   npm (Node Package Manager) or Yarn
-
-### Installation
-
-1.  **Clone the repository (if you haven't already):**
-    ```bash
-    git clone https://github.com/50101063/flowisetemp.git
-    cd flowisetemp
-    ```
-
-2.  **Navigate to the frontend directory:**
-    ```bash
-    cd frontend
-    ```
-
-3.  **Install dependencies:**
-    ```bash
-    npm install
-    # OR
-    yarn install
-    ```
-
-### Running the Application
-
-To run the application in development mode:
-
-```bash
-npm run dev
-# OR
-yarn dev
-```
-
-This will start the Vite development server. You can usually access the application at `http://localhost:5173` (or another port if 5173 is in use). The console will show the exact URL.
-
-### Building for Production
-
-To build the application for production (this will create an optimized `dist` folder):
-
-```bash
-npm run build
-# OR
-yarn build
-```
-
-After building, you can preview the production build locally:
-
-```bash
-npm run preview
-# OR
-yarn preview
-```
-
-### Linting
-
-To run ESLint to check for code quality and style issues:
-
-```bash
-npm run lint
-# OR
-yarn lint
-```
-
-## API Integration
-
-The frontend will interact with the backend API (developed using Django REST Framework) for all data operations. API endpoints and request/response formats will be defined in collaboration with the Backend Development team. `React Query` will be used to manage server state efficiently.
+For demonstration purposes, this frontend includes basic API simulation using local state to mimic backend interactions.
+**To connect to a real backend, ensure your `VITE_API_BASE_URL` in `.env` is correctly set, and update the `src/api/*.js` files to make actual `fetch` or `axios` calls to your backend endpoints.**
 
 ## Contributing
 
-Contributions are welcome! Please ensure your code adheres to the established coding standards and includes appropriate tests.
-
----
-
-*This `README.md` provides basic instructions. Further details on specific UI components, state management patterns, and advanced API integrations will be added as development progresses.*
+Please refer to the main repository's `CONTRIBUTING.md` (if available) for guidelines.
