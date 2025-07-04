@@ -1,26 +1,31 @@
 # Personal Recipe Card Organizer - Frontend
 
-This directory contains the frontend application for the Personal Recipe Card Organizer, built using React, Vite, and Tailwind CSS.
+This repository contains the frontend application for the Personal Recipe Card Organizer, built with React, Vite, and Tailwind CSS.
 
 ## Table of Contents
-
-- [Project Overview](#project-overview)
+- [Introduction](#introduction)
+- [Features](#features)
 - [Technology Stack](#technology-stack)
-- [Setup Instructions](#setup-instructions)
+- [Prerequisites](#prerequisites)
+- [Setup and Installation](#setup-and-installation)
 - [Running the Application](#running-the-application)
 - [Project Structure](#project-structure)
-- [API Integration](#api-integration)
-- [Key Features Implemented](#key-features-implemented)
+- [API Endpoints](#api-endpoints)
+- [Contributing](#contributing)
+- [License](#license)
 
-## Project Overview
+## Introduction
 
-The frontend provides the user interface for managing personal recipes. It allows users to:
-- Register and Log In
-- View a list of their recipes
-- Create, View, Edit, and Delete individual recipes
-- Search recipes by name or ingredient
+The Personal Recipe Card Organizer is a web application designed to help home cooks and food enthusiasts digitize, store, organize, and quickly find their cherished recipes. This frontend application provides an intuitive and responsive user interface for managing recipes, including creation, viewing, editing, deletion, and basic search/filter functionalities.
+
+## Features
+
+- User Registration and Authentication (Login/Logout)
+- Create, View, Edit, and Delete personal recipe entries
+- Display a list of user's recipes
+- Search recipes by name or ingredients
 - Filter recipes by category/tag
-- Experience a fully responsive design across various devices.
+- Responsive design for various screen sizes (desktop, tablet, mobile)
 
 ## Technology Stack
 
@@ -29,41 +34,38 @@ The frontend provides the user interface for managing personal recipes. It allow
 - **Styling Framework:** Tailwind CSS 3.x
 - **Routing:** React Router DOM 6.x
 
-## Setup Instructions
+## Prerequisites
 
-To get the frontend application up and running on your local machine, follow these steps:
+Before you begin, ensure you have the following installed on your machine:
 
-1.  **Node.js and npm/yarn:** Ensure you have Node.js (v18 or higher recommended) and npm (or yarn) installed.
-    -   You can download Node.js from [nodejs.org](https://nodejs.org/).
-    -   Check installations:
-        ```bash
-        node -v
-        npm -v
-        # or
-        yarn -v
-        ```
+- [Node.js](https://nodejs.org/en/download/) (LTS version recommended, e.g., 18.x or 20.x)
+- [npm](https://www.npmjs.com/get-npm) (comes with Node.js) or [Yarn](https://yarnpkg.com/getting-started/install)
 
-2.  **Clone the Repository:** If you haven't already, clone the entire project repository:
+## Setup and Installation
+
+1.  **Clone the repository:**
     ```bash
     git clone https://github.com/50101063/flowisetemp.git
-    cd flowisetemp
+    cd flowisetemp/frontend
     ```
 
-3.  **Navigate to Frontend Directory:**
-    ```bash
-    cd frontend
-    ```
-
-4.  **Install Dependencies:** Install all the required Node.js packages.
+2.  **Install dependencies:**
     ```bash
     npm install
     # or
     yarn install
     ```
 
+3.  **Environment Variables:**
+    Create a `.env` file in the `frontend/` directory based on `.env.example` (if provided, or create one with `VITE_API_BASE_URL`).
+    ```
+    VITE_API_BASE_URL=http://localhost:8000/api
+    ```
+    *Note: Replace `http://localhost:8000/api` with the actual URL of your backend API if it's deployed elsewhere.*
+
 ## Running the Application
 
-After installing the dependencies, you can start the development server:
+To start the development server:
 
 ```bash
 npm run dev
@@ -71,51 +73,50 @@ npm run dev
 yarn dev
 ```
 
-The application will typically be accessible at `http://localhost:5173` (or another port if 5173 is in use). The console will show the exact URL.
+The application will typically run on `http://localhost:5173` (or another available port). Open your browser and navigate to this address.
 
 ## Project Structure
-
-The `frontend/` directory is structured as follows:
 
 ```
 frontend/
 ├── public/
-│   └── vite.svg
+│   └── index.html             # Main HTML file
 ├── src/
-│   ├── assets/
-│   │   └── react.svg
-│   ├── components/       # Reusable UI components
-│   │   ├── Navbar.jsx
-│   │   └── ...
-│   ├── pages/            # Page-level components (routes)
-│   │   ├── HomePage.jsx
-│   │   ├── LoginPage.jsx
-│   │   ├── RegisterPage.jsx
-│   │   ├── RecipeListPage.jsx
-│   │   ├── RecipeDetailPage.jsx
-│   │   └── RecipeFormPage.jsx
-│   ├── App.jsx           # Main application component, handles routing
-│   ├── main.jsx          # Entry point for React application
-│   └── index.css         # Global CSS (Tailwind imports)
-├── index.html            # Main HTML file
-├── package.json          # Project dependencies and scripts
-├── package-lock.json     # Locked dependencies (if using npm)
-├── postcss.config.js     # PostCSS configuration for Tailwind
-├── tailwind.config.js    # Tailwind CSS configuration
-└── vite.config.js        # Vite build tool configuration
+│   ├── assets/                # Static assets (images, etc.)
+│   ├── components/            # Reusable UI components
+│   │   ├── Auth/              # Login, Register forms
+│   │   ├── Recipes/           # Recipe-related components (list, form, detail)
+│   │   ├── Layout/            # Navigation, headers, footers
+│   │   └── Common/            # Generic UI elements (buttons, inputs)
+│   ├── context/               # React Context for global state (e.g., AuthContext)
+│   ├── services/              # API integration logic
+│   ├── App.jsx                # Main application component, handles routing
+│   ├── index.css              # Global styles and Tailwind CSS imports
+│   └── main.jsx               # React entry point
+├── .gitignore                 # Files/folders to ignore in Git
+├── package.json               # Project dependencies and scripts
+├── postcss.config.js          # PostCSS configuration for Tailwind CSS
+├── README.md                  # This file
+├── tailwind.config.js         # Tailwind CSS configuration
+└── vite.config.js             # Vite build tool configuration
 ```
 
-## API Integration
+## API Endpoints
 
-The frontend interacts with the backend API (FastAPI) for all data operations (authentication, CRUD for recipes, search, filter).
-- All API calls will be made to endpoints defined in the backend (e.g., `/api/register`, `/api/login`, `/api/recipes`).
-- Authentication is handled via JWTs, which are sent in the `Authorization` header for protected routes.
-- Error handling and loading states are implemented for a smooth user experience.
+This frontend application interacts with the following backend API endpoints:
 
-## Key Features Implemented (Placeholders)
+-   `/api/register`: User registration
+-   `/api/login`: User login
+-   `/api/recipes`: CRUD operations for recipes (GET, POST, PUT, DELETE)
+-   `/api/recipes?search=<keyword>`: Search recipes
+-   `/api/recipes?category=<tag>`: Filter recipes
 
-This initial commit sets up the basic project structure and core components. Specific functionalities like full API integration, state management, and detailed form handling will be implemented in subsequent development phases.
+*Refer to the backend documentation for full API specifications.*
 
--   **Routing:** Basic routing using React Router DOM is set up for different pages.
--   **Responsive Design:** Tailwind CSS is configured to enable responsive styling.
--   **Component Structure:** A modular component structure is established for maintainability.
+## Contributing
+
+Contributions are welcome! Please follow the standard GitHub flow: fork the repository, create a new branch, make your changes, and submit a pull request.
+
+## License
+
+This project is licensed under the MIT License. See the `LICENSE` file for details.
