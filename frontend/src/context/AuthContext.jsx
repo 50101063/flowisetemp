@@ -1,68 +1,48 @@
-import React, { createContext, useState, useEffect } from 'react';
-import api from '../api/api';
+import React, { createContext, useContext, useState, useEffect } from 'react'
 
-const AuthContext = createContext();
+const AuthContext = createContext(null)
 
-const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null)
 
+  // In a real application, you would check for a token in localStorage
+  // and validate it with your backend here on initial load.
   useEffect(() => {
-    const loadUser = () => {
-      try {
-        const storedUser = localStorage.getItem('user');
-        const token = localStorage.getItem('token');
-        if (storedUser && token) {
-          setUser(JSON.parse(storedUser));
-          // Potentially validate token with backend here if needed
-        }
-      } catch (error) {
-        console.error("Failed to load user from localStorage", error);
-        localStorage.clear(); // Clear invalid data
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadUser();
-  }, []);
-
-  const login = async (username, password) => {
-    try {
-      const response = await api.post('/auth/login', { username, password });
-      const { access_token, user: userData } = response.data;
-      localStorage.setItem('token', access_token);
-      localStorage.setItem('user', JSON.stringify(userData));
-      setUser(userData);
-      return { success: true };
-    } catch (error) {
-      console.error("Login failed:", error.response?.data || error.message);
-      return { success: false, message: error.response?.data?.detail || "Login failed" };
+    const storedUser = localStorage.getItem('user')
+    if (storedUser) {
+      setUser(JSON.parse(storedUser))
     }
-  };
+  }, [])
 
-  const register = async (username, password) => {
-    try {
-      const response = await api.post('/auth/register', { username, password });
-      // After successful registration, you might want to automatically log them in
-      // For now, just return success and let them navigate to login
-      return { success: true, message: response.data.message || "Registration successful!" };
-    } catch (error) {
-      console.error("Registration failed:", error.response?.data || error.message);
-      return { success: false, message: error.response?.data?.detail || "Registration failed" };
-    }
-  };
+  const login = (userData) => {
+    // In a real application, this would involve an API call
+    // to your backend for authentication.
+    console.log("Attempting to log in with:", userData)
+    const mockUser = { username: userData.username, token: 'mock-jwt-token' } // Mock token
+    setUser(mockUser)
+    localStorage.setItem('user', JSON.stringify(mockUser))
+  }
 
   const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setUser(null);
-  };
+    setUser(null)
+    localStorage.removeItem('user')
+  }
+
+  const register = (userData) => {
+    // In a real application, this would involve an API call
+    // to your backend for user registration.
+    console.log("Attempting to register with:", userData)
+    // For simplicity, mock registration also logs in the user directly
+    login({ username: userData.username, password: userData.password }) 
+  }
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, loading }}>
-      {!loading && children}
+    <AuthContext.Provider value={{ user, login, logout, register }}>
+      {children}
     </AuthContext.Provider>
-  );
-};
+  )
+}
 
-export { AuthContext, AuthProvider };
+export const useAuth = () => {
+  return useContext(AuthContext)
+}
