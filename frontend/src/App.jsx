@@ -1,63 +1,29 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import HomePage from './pages/HomePage';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import { useAuth } from './context/AuthContext';
-import Header from './components/Header';
-import RecipeForm from './components/RecipeForm';
-import RecipeDetail from './components/RecipeDetail';
-
-function PrivateRoute({ children }) {
-  const { isAuthenticated } = useAuth();
-  return isAuthenticated ? children : <Navigate to="/login" />;
-}
+import { useState } from 'react'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import Navbar from './components/Navbar'
+import HomePage from './pages/HomePage'
+import LoginPage from './pages/LoginPage'
+import RegisterPage from './pages/RegisterPage'
+import { AuthProvider } from './context/AuthContext'
 
 function App() {
   return (
     <Router>
-      <Header />
-      <div className="container mx-auto p-4">
-        <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route
-            path="/"
-            element={
-              <PrivateRoute>
-                <HomePage />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/add-recipe"
-            element={
-              <PrivateRoute>
-                <RecipeForm />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/edit-recipe/:id"
-            element={
-              <PrivateRoute>
-                <RecipeForm />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/recipes/:id"
-            element={
-              <PrivateRoute>
-                <RecipeDetail />
-              </PrivateRoute>
-            }
-          />
-          <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
-      </div>
+      <AuthProvider>
+        <div className="min-h-screen bg-gray-100 font-sans">
+          <Navbar />
+          <main className="container mx-auto p-4">
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+              {/* Add other routes here for recipe management */}
+            </Routes>
+          </main>
+        </div>
+      </AuthProvider>
     </Router>
-  );
+  )
 }
 
-export default App;
+export default App
