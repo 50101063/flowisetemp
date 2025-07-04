@@ -1,89 +1,110 @@
-# Database Setup and Management for Personal Recipe Card Organizer
+# Database Folder for Personal Recipe Card Organizer
 
-This directory contains all the necessary SQL scripts and documentation for setting up, managing, and interacting with the PostgreSQL database for the Personal Recipe Card Organizer application.
+This `database/` folder contains all the SQL scripts and related configurations for the Personal Recipe Card Organizer application's data layer. The database is designed to store user accounts and their associated recipe entries, ensuring data integrity and efficient retrieval.
 
-## Database Technology
+## 1. Database Technologies
 
-The chosen database system is **PostgreSQL 15.x**.
+*   **Database System:** PostgreSQL 15.x
+*   **ORM (used by Backend):** SQLAlchemy (Python)
 
-## Schema Overview
+PostgreSQL was chosen for its robustness, ACID compliance, performance, and scalability, making it an ideal relational database for this application.
 
-The database comprises two main tables: `users` and `recipes`.
+## 2. Schema Overview
+
+The database schema is defined in `schema.sql` and consists of two primary tables:
 
 ### `users` Table
+Stores user account information.
 
-Stores user authentication and profile information.
-
--   `id`: Primary Key, auto-incrementing integer.
--   `username`: Unique username for login, string.
--   `password_hash`: Hashed and salted password, string.
--   `created_at`: Timestamp of user creation.
+| Column Name   | Data Type                   | Constraints                                |
+| :------------ | :-------------------------- | :----------------------------------------- |
+| `id`          | `SERIAL` (Primary Key)      | Unique identifier for each user            |
+| `username`    | `VARCHAR(255)`              | Unique, Not Null                           |
+| `password_hash` | `VARCHAR(255)`              | Not Null (stores securely hashed password) |
+| `created_at`  | `TIMESTAMP WITH TIME ZONE`  | Default: `CURRENT_TIMESTAMP`               |
 
 ### `recipes` Table
+Stores individual recipe entries, linked to a user.
 
-Stores individual recipe entries associated with a user.
+| Column Name   | Data Type                   | Constraints                                |
+| :------------ | :-------------------------- | :----------------------------------------- |
+| `id`          | `SERIAL` (Primary Key)      | Unique identifier for each recipe          |
+| `user_id`     | `INTEGER`                   | Not Null, Foreign Key to `users.id`        |
+| `name`        | `VARCHAR(255)`              | Not Null                                   |
+| `ingredients` | `TEXT`                      | Stores multi-line ingredient list          |
+| `instructions`| `TEXT`                      | Stores multi-line cooking instructions     |
+| `category`    | `VARCHAR(100)`              | e.g., "Breakfast", "Dinner", "Dessert"   |
+| `created_at`  | `TIMESTAMP WITH TIME ZONE`  | Default: `CURRENT_TIMESTAMP`               |
+| `updated_at`  | `TIMESTAMP WITH TIME ZONE`  | Default: `CURRENT_TIMESTAMP`, auto-updated |
 
--   `id`: Primary Key, auto-incrementing integer.
--   `user_id`: Foreign Key referencing `users.id`. Ensures recipes are linked to specific users. `ON DELETE CASCADE` ensures that if a user is deleted, all their recipes are also deleted.
--   `name`: Name of the recipe, string.
--   `ingredients`: Text field for recipe ingredients.
--   `instructions`: Text field for cooking instructions.
--   `category`: Optional category or tag for the recipe (e.g., "Breakfast", "Dinner", "Dessert").
--   `created_at`: Timestamp of recipe creation.
--   `updated_at`: Timestamp of the last update to the recipe. This field is automatically updated by a trigger.
+**Relationship:** There is a one-to-many relationship between `users` and `recipes`, meaning one user can have many recipes.
 
-## Setup Instructions
+**Indexes:** Indexes are created on `user_id` (for efficient lookup of a user's recipes), `name` (for recipe name search), and `category` (for filtering recipes).
 
-To set up the database, follow these steps:
+## 3. Local Development Setup Instructions (PostgreSQL)
+
+To set up the database for local development, follow these steps:
 
 1.  **Install PostgreSQL:**
-    Ensure you have PostgreSQL 15.x or later installed on your system. You can download it from the official PostgreSQL website or use your system's package manager.
+    *   Download and install PostgreSQL 15.x from the official website ([https://www.postgresql.org/download/](https://www.postgresql.org/download/)) or use a package manager (e.g., `brew install postgresql` on macOS, `sudo apt-get install postgresql` on Debian/Ubuntu).
 
-2.  **Create a Database:**
-    Connect to your PostgreSQL server as a superuser or a user with database creation privileges and create a new database for the application.
-
+2.  **Create a Database User (Optional but Recommended):**
+    It's good practice to create a dedicated user for your application.
     ```bash
-    psql -U postgres
-    CREATE DATABASE recipe_organizer_db;
+    sudo -u postgres psql
+    CREATE USER recipe_user WITH PASSWORD 'your_secure_password';
+    ALTER USER recipe_user WITH CREATEDB; -- Grant permission to create databases
+    \q
+    ```
+    Replace `your_secure_password` with a strong password.
+
+3.  **Create the Database:**
+    ```bash
+    sudo -u postgres psql
+    CREATE DATABASE recipe_organizer OWNER recipe_user;
+    \q
+    ```
+    Or, if you logged in as `recipe_user` after granting `CREATEDB`:
+    ```bash
+    psql -U recipe_user -d postgres
+    CREATE DATABASE recipe_organizer;
     \q
     ```
 
-3.  **Create a Database User (Optional but Recommended):**
-    For security, it's recommended to create a dedicated user for the application with limited privileges.
-
+4.  **Apply the Schema:**
+    Navigate to this `database/` folder in your terminal and apply the schema to your newly created database.
     ```bash
-    psql -U postgres
-    CREATE USER recipe_app_user WITH PASSWORD 'your_secure_password';
-    GRANT ALL PRIVILEGES ON DATABASE recipe_organizer_db TO recipe_app_user;
-    \q
+    psql -U recipe_user -d recipe_organizer -f schema.sql
     ```
+    You will be prompted for the password for `recipe_user`.
 
-4.  **Run the Schema Script:**
-    Navigate to this `database/` directory in your terminal and execute the `schema.sql` script against your newly created database.
+    This command will create the `users` and `recipes` tables, set up foreign key constraints, and add indexes.
 
-    ```bash
-    psql -U recipe_app_user -d recipe_organizer_db -f schema.sql
-    ```
-    (Replace `recipe_app_user` and `recipe_organizer_db` with your actual username and database name if different).
+## 4. Integration with Backend
 
-## Database Interaction
+The backend application (developed using Python FastAPI and SQLAlchemy) will connect to this PostgreSQL database using a connection string. This connection string is typically configured via environment variables.
 
-The backend application (developed using Python with FastAPI and SQLAlchemy) will interact with this database.
+Example `DATABASE_URL` for local development:
 
--   **Connection String:** The backend will use a connection string to connect to the database. Example for `recipe_app_user` on `localhost`:
-    `postgresql://recipe_app_user:your_secure_password@localhost:5432/recipe_organizer_db`
+```
+DATABASE_URL="postgresql://recipe_user:your_secure_password@localhost:5432/recipe_organizer"
+```
 
--   **ORM Usage:** SQLAlchemy will be used to manage database sessions, perform CRUD operations, and handle data migrations.
+The SQLAlchemy ORM in the backend will handle all database interactions, abstracting the raw SQL queries defined in `schema.sql`. It will manage sessions, execute CRUD operations, and ensure proper data mapping between Python objects and database rows.
 
-## Backup and Recovery (Conceptual)
+## 5. Backup and Recovery
 
-While specific scripts are not provided in this initial setup, a robust application would include:
+Regular backups of the `recipe_organizer` database are crucial. PostgreSQL provides tools like `pg_dump` for creating backups and `pg_restore` for restoring them.
 
--   **Regular Backups:** Implement daily or hourly automated backups of the `recipe_organizer_db` using `pg_dump`.
--   **Recovery Procedures:** Document and test procedures for restoring the database from backups in case of data loss or corruption.
+Example backup command:
+```bash
+pg_dump -U recipe_user -d recipe_organizer > recipe_organizer_backup.sql
+```
 
-## Data Migration (Conceptual)
+## 6. Security Considerations
 
-For future schema changes, a database migration tool (e.g., Alembic for SQLAlchemy) should be employed to manage schema versioning and apply incremental updates without data loss.
+*   **Password Hashing:** User passwords are not stored directly but as secure hashes (`password_hash`).
+*   **Least Privilege:** The database user (`recipe_user`) should ideally be granted only the necessary permissions required by the application.
+*   **Secure Connection:** Ensure that the connection between the backend and the database is secure, especially in production environments (e.g., using SSL/TLS).
 
 ---
