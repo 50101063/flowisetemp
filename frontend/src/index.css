@@ -2,12 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Optional: Add some basic global styles here */
+/* Optional: Add any global custom styles here if needed */
 body {
-  font-family: 'Inter', sans-serif;
-  @apply bg-gray-100 text-gray-900;
-}
-
-#root {
-  @apply flex flex-col min-h-screen;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
