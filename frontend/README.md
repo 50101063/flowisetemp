@@ -1,85 +1,121 @@
 # Personal Recipe Card Organizer - Frontend
 
-This folder contains the frontend application for the Personal Recipe Card Organizer, built with React, Vite, and Tailwind CSS.
+This directory contains the frontend application for the Personal Recipe Card Organizer, built using React, Vite, and Tailwind CSS.
 
-## Technologies Used
+## Table of Contents
 
-*   **React 18.x**: A JavaScript library for building user interfaces.
-*   **Vite 5.x**: A fast build tool that provides a lightning-fast development experience.
-*   **Tailwind CSS 3.x**: A utility-first CSS framework for rapidly building custom designs.
-*   **React Router DOM 6.x**: For declarative routing in React applications.
-*   **Context API**: For simple state management.
+- [Project Overview](#project-overview)
+- [Technology Stack](#technology-stack)
+- [Setup Instructions](#setup-instructions)
+- [Running the Application](#running-the-application)
+- [Project Structure](#project-structure)
+- [API Integration](#api-integration)
+- [Key Features Implemented](#key-features-implemented)
+
+## Project Overview
+
+The frontend provides the user interface for managing personal recipes. It allows users to:
+- Register and Log In
+- View a list of their recipes
+- Create, View, Edit, and Delete individual recipes
+- Search recipes by name or ingredient
+- Filter recipes by category/tag
+- Experience a fully responsive design across various devices.
+
+## Technology Stack
+
+- **JavaScript Framework:** React 18.x
+- **Build Tool:** Vite 5.x
+- **Styling Framework:** Tailwind CSS 3.x
+- **Routing:** React Router DOM 6.x
 
 ## Setup Instructions
 
 To get the frontend application up and running on your local machine, follow these steps:
 
-1.  **Navigate to the frontend directory:**
+1.  **Node.js and npm/yarn:** Ensure you have Node.js (v18 or higher recommended) and npm (or yarn) installed.
+    -   You can download Node.js from [nodejs.org](https://nodejs.org/).
+    -   Check installations:
+        ```bash
+        node -v
+        npm -v
+        # or
+        yarn -v
+        ```
+
+2.  **Clone the Repository:** If you haven't already, clone the entire project repository:
+    ```bash
+    git clone https://github.com/50101063/flowisetemp.git
+    cd flowisetemp
+    ```
+
+3.  **Navigate to Frontend Directory:**
     ```bash
     cd frontend
     ```
 
-2.  **Install dependencies:**
+4.  **Install Dependencies:** Install all the required Node.js packages.
     ```bash
     npm install
+    # or
+    yarn install
     ```
-
-3.  **Configure Environment Variables (if any):**
-    Create a `.env` file in the `frontend/` directory (if required by the backend API URL or other configurations). For example:
-    ```
-    VITE_API_BASE_URL=http://localhost:8000/api
-    ```
-    *Note: Replace `http://localhost:8000/api` with the actual base URL of your backend API.*
 
 ## Running the Application
 
-To start the development server:
+After installing the dependencies, you can start the development server:
 
 ```bash
 npm run dev
+# or
+yarn dev
 ```
 
-This will typically start the application on `http://localhost:5173` (or another available port). The application will automatically reload when you make changes to the source code.
-
-## Build for Production
-
-To build the application for production:
-
-```bash
-npm run build
-```
-
-This command will create a `dist/` folder containing the optimized production-ready static assets.
+The application will typically be accessible at `http://localhost:5173` (or another port if 5173 is in use). The console will show the exact URL.
 
 ## Project Structure
+
+The `frontend/` directory is structured as follows:
 
 ```
 frontend/
 ├── public/
-│   └── favicon.ico
+│   └── vite.svg
 ├── src/
-│   ├── components/
-│   │   ├── Auth.jsx
-│   │   ├── RecipeDetail.jsx
-│   │   ├── RecipeForm.jsx
-│   │   └── RecipeList.jsx
-│   ├── App.jsx
-│   ├── index.css
-│   └── main.jsx
-├── .env.example
-├── index.html
-├── package.json
-├── package-lock.json
-├── README.md
-├── tailwind.config.js
-└── vite.config.js
+│   ├── assets/
+│   │   └── react.svg
+│   ├── components/       # Reusable UI components
+│   │   ├── Navbar.jsx
+│   │   └── ...
+│   ├── pages/            # Page-level components (routes)
+│   │   ├── HomePage.jsx
+│   │   ├── LoginPage.jsx
+│   │   ├── RegisterPage.jsx
+│   │   ├── RecipeListPage.jsx
+│   │   ├── RecipeDetailPage.jsx
+│   │   └── RecipeFormPage.jsx
+│   ├── App.jsx           # Main application component, handles routing
+│   ├── main.jsx          # Entry point for React application
+│   └── index.css         # Global CSS (Tailwind imports)
+├── index.html            # Main HTML file
+├── package.json          # Project dependencies and scripts
+├── package-lock.json     # Locked dependencies (if using npm)
+├── postcss.config.js     # PostCSS configuration for Tailwind
+├── tailwind.config.js    # Tailwind CSS configuration
+└── vite.config.js        # Vite build tool configuration
 ```
 
-## Available Scripts
+## API Integration
 
-*   `npm run dev`: Starts the development server.
-*   `npm run build`: Builds the app for production.
-*   `npm run lint`: Lints the code.
-*   `npm run preview`: Serves the production build locally.
+The frontend interacts with the backend API (FastAPI) for all data operations (authentication, CRUD for recipes, search, filter).
+- All API calls will be made to endpoints defined in the backend (e.g., `/api/register`, `/api/login`, `/api/recipes`).
+- Authentication is handled via JWTs, which are sent in the `Authorization` header for protected routes.
+- Error handling and loading states are implemented for a smooth user experience.
 
----
+## Key Features Implemented (Placeholders)
+
+This initial commit sets up the basic project structure and core components. Specific functionalities like full API integration, state management, and detailed form handling will be implemented in subsequent development phases.
+
+-   **Routing:** Basic routing using React Router DOM is set up for different pages.
+-   **Responsive Design:** Tailwind CSS is configured to enable responsive styling.
+-   **Component Structure:** A modular component structure is established for maintainability.
