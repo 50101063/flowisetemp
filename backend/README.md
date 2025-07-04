@@ -1,242 +1,98 @@
-# Backend for Online Course Registration System
+# Personal Recipe Card Organizer - Backend
 
-This folder contains the backend application for the Online Course Registration System, built with Django and Django REST Framework.
+This folder contains the backend services for the Personal Recipe Card Organizer application, built with FastAPI, Python, and PostgreSQL.
 
 ## Technologies Used
 
-*   **Python**: 3.11+
-*   **Django**: 4.2+
-*   **Django REST Framework**: 3.14+
-*   **PostgreSQL**: Database
-*   **Redis**: Caching and Celery broker
-*   **Celery**: Asynchronous task queue
-*   **Stripe**: Payment processing
-*   **AWS SES (via boto3)**: Email sending
-*   **Docker**: Containerization
+*   **Python 3.10+**
+*   **FastAPI 0.100+**: Web framework for building APIs.
+*   **SQLAlchemy**: ORM for interacting with PostgreSQL.
+*   **Pydantic**: For data validation and serialization.
+*   **python-jose[cryptography]**: For JWT authentication.
+*   **Bcrypt**: For password hashing.
+*   **Uvicorn**: ASGI server to run FastAPI.
+*   **Psycopg2-binary**: PostgreSQL adapter for Python.
 
 ## Setup Instructions
 
-### Prerequisites
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/50101063/flowisetemp.git
+    cd flowisetemp/backend
+    ```
 
-*   Docker and Docker Compose (recommended for local development)
-*   Python 3.11+
-*   Poetry (optional, for dependency management) or pip
+2.  **Create a Python virtual environment and activate it:**
+    ```bash
+    python -m venv venv
+    # On Windows
+    .\venv\Scripts\activate
+    # On macOS/Linux
+    source venv/bin/activate
+    ```
 
-### 1. Clone the Repository
+3.  **Install dependencies:**
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-If you haven't already, clone the main repository:
+4.  **Database Setup (PostgreSQL):**
+    *   Ensure you have a PostgreSQL server running.
+    *   Create a database (e.g., `recipe_organizer_db`).
+    *   Create a user with appropriate permissions.
+    *   Update the database connection string in `main.py` or set it via environment variables (recommended for production).
+        Example `DATABASE_URL`: `postgresql://user:password@host:port/database_name`
 
-```bash
-git clone https://github.com/50101063/flowisetemp.git
-cd flowisetemp
-```
+5.  **Environment Variables:**
+    Create a `.env` file in the `backend/` directory with the following variables:
+    ```
+    DATABASE_URL="postgresql://user:password@host:5432/recipe_organizer_db"
+    SECRET_KEY="your-super-secret-key" # Generate a strong random key
+    ALGORITHM="HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES=30
+    ```
 
-### 2. Navigate to the Backend Directory
+    *   `DATABASE_URL`: Your PostgreSQL connection string.
+    *   `SECRET_KEY`: A strong secret key used for JWT encoding. You can generate one using `openssl rand -hex 32`.
+    *   `ALGORITHM`: The algorithm used for JWT signing (e.g., HS256).
+    *   `ACCESS_TOKEN_EXPIRE_MINUTES`: How long the access token is valid.
 
-```bash
-cd backend
-```
+## Running the Application
 
-### 3. Environment Configuration
+1.  **Activate your virtual environment** (if not already active).
+2.  **Navigate to the `backend/` directory.**
+3.  **Run the FastAPI application using Uvicorn:**
+    ```bash
+    uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    ```
+    The `--reload` flag is useful for development as it restarts the server on code changes.
 
-Create a `.env` file in the `backend/` directory by copying the example:
+4.  **Access the API Documentation:**
+    Once the server is running, you can access the interactive API documentation (Swagger UI) at:
+    `http://127.0.0.1:8000/docs`
+    or ReDoc at:
+    `http://127.0.0.1:8000/redoc`
 
-```bash
-cp .env.example .env
-```
+## API Endpoints
 
-Edit the `.env` file and fill in the required values. These are crucial for database connection, secret keys, and external service integrations.
+The API provides the following endpoints:
 
-```ini
-# Django Secret Key - IMPORTANT: GENERATE A STRONG, UNIQUE KEY FOR PRODUCTION
-SECRET_KEY='your_django_secret_key_here'
-DEBUG=True # Set to False in production
+### User Management
+*   `POST /register`: Register a new user.
+*   `POST /token`: Authenticate user and get an access token.
 
-# Database Configuration (PostgreSQL)
-DB_NAME=course_registration_db
-DB_USER=user
-DB_PASSWORD=password
-DB_HOST=localhost # Use 'db' if running with Docker Compose
-DB_PORT=5432
-
-# Redis Configuration (for Celery and Caching)
-REDIS_HOST=localhost # Use 'redis' if running with Docker Compose
-REDIS_PORT=6379
-REDIS_DB=0
-
-# Stripe API Keys
-STRIPE_SECRET_KEY='sk_test_...'
-STRIPE_WEBHOOK_SECRET='whsec_...' # Your Stripe webhook signing secret (optional for local testing)
-
-# AWS SES Configuration (for sending emails)
-# Ensure your AWS credentials are configured via environment variables, AWS CLI, or IAM roles
-# AWS_ACCESS_KEY_ID='your_aws_access_key_id'
-# AWS_SECRET_ACCESS_KEY='your_aws_secret_access_key'
-AWS_REGION_NAME='your_aws_region' # e.g., us-east-1
-DEFAULT_FROM_EMAIL='noreply@yourdomain.com' # Email address verified in SES
-```
-
-### 4. Running with Docker Compose (Recommended for Local Development)
-
-Docker Compose simplifies running the Django application along with its dependencies (PostgreSQL, Redis).
-
-Create a `docker-compose.yml` file in the `backend/` directory:
-
-```yaml
-version: '3.8'
-
-services:
-  db:
-    image: postgres:15-alpine
-    restart: always
-    environment:
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-    ports:
-      - "5432:5432"
-    volumes:
-      - pg_data:/var/lib/postgresql/data/
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
-  redis:
-    image: redis:7-alpine
-    restart: always
-    ports:
-      - "6379:6379"
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 3s
-      retries: 5
-
-  backend:
-    build: .
-    restart: always
-    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
-    volumes:
-      - .:/app/backend
-    ports:
-      - "8000:8000"
-    env_file:
-      - ./.env
-    depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-
-  celery_worker:
-    build: .
-    restart: always
-    command: celery -A course_registration_backend worker -l info
-    volumes:
-      - .:/app/backend
-    env_file:
-      - ./.env
-    depends_on:
-      backend:
-        condition: service_started # or service_healthy if backend has a healthcheck
-      redis:
-        condition: service_healthy
-
-  celery_beat:
-    build: .
-    restart: always
-    command: celery -A course_registration_backend beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
-    volumes:
-      - .:/app/backend
-    env_file:
-      - ./.env
-    depends_on:
-      backend:
-        condition: service_started
-      redis:
-        condition: service_healthy
-
-volumes:
-  pg_data:
-```
-
-Now, build and run the services:
-
-```bash
-docker-compose up --build -d
-```
-
-Check the logs:
-
-```bash
-docker-compose logs -f
-```
-
-The backend API will be accessible at `http://localhost:8000`.
-
-### 5. Manual Setup (without Docker Compose)
-
-#### 5.1. Install Python Dependencies
-
-Make sure you have Python 3.11+ installed. It's recommended to use a virtual environment.
-
-```bash
-python3 -m venv venv
-source venv/bin/activate # On Windows: .\venv\Scripts\activate
-pip install -r requirements.txt
-```
-
-#### 5.2. Start PostgreSQL and Redis
-
-Ensure you have a PostgreSQL database and Redis server running locally, and update your `.env` file with the correct connection details.
-
-#### 5.3. Run Database Migrations
-
-```bash
-python manage.py migrate
-```
-
-#### 5.4. Create a Superuser (for Django Admin)
-
-```bash
-python manage.py createsuperuser
-```
-
-#### 5.5. Run the Django Development Server
-
-```bash
-python manage.py runserver 0.0.0.0:8000
-```
-
-#### 5.6. Run Celery Worker (in a separate terminal)
-
-```bash
-celery -A course_registration_backend worker -l info
-```
-
-#### 5.7. Run Celery Beat (if using scheduled tasks, in another terminal)
-
-```bash
-celery -A course_registration_backend beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
-```
-
-The backend API will be accessible at `http://localhost:8000`.
-
-## API Endpoints (Initial)
-
-*   `http://localhost:8000/api/courses/` - List and create courses
-*   `http://localhost:8000/api/courses/<id>/` - Retrieve, update, delete a course
-*   `http://localhost:8000/api/users/` - List and create users (for registration)
-*   `http://localhost:8000/api/enrollments/` - List and create enrollments
-*   `http://localhost:8000/api/payments/` - List and create payments (triggered internally by Stripe webhooks)
-*   `http://localhost:8000/admin/` - Django Admin Panel
+### Recipe Management (Requires Authentication)
+*   `POST /recipes/`: Create a new recipe.
+*   `GET /recipes/`: Retrieve all recipes for the logged-in user.
+*   `GET /recipes/{recipe_id}`: Retrieve a single recipe by ID.
+*   `PUT /recipes/{recipe_id}`: Update an existing recipe.
+*   `DELETE /recipes/{recipe_id}`: Delete a recipe.
+*   `GET /recipes/search`: Search recipes by name or ingredients.
+*   `GET /recipes/filter`: Filter recipes by category.
 
 ## Integration with Frontend
 
-The frontend application (React) should be configured to make API requests to `http://localhost:8000` (or the deployed backend URL). Ensure CORS settings in `settings.py` allow requests from your frontend's origin.
+The frontend application (likely running on a different port/domain) will interact with this backend API. Ensure Cross-Origin Resource Sharing (CORS) is correctly configured in `main.py` if your frontend is served from a different origin than your backend.
 
-## Deployment
+## Database Schema
 
-For production deployment, it is highly recommended to use a robust WSGI server like Gunicorn/Uvicorn, configure a proper reverse proxy (Nginx), and deploy to a cloud environment (e.g., AWS EKS as per Solution Architect's design). Refer to the `Dockerfile` for a basic production command. Ensure `DEBUG=False` and `ALLOWED_HOSTS` are correctly configured in `settings.py`.
+Refer to the `database/schema.sql` file in the `database/` folder for the detailed database schema (Users and Recipes tables).
