@@ -9,7 +9,7 @@ const api = axios.create({
   },
 });
 
-// Request interceptor to add the JWT token to headers
+// Add a request interceptor to include the JWT token
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -23,21 +23,19 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor to handle token expiration or invalid tokens
-api.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
-    // If the error is 401 Unauthorized and it's not a login attempt
-    if (error.response.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-      // You might want to clear local storage and redirect to login here
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login'; // Redirect to login page
-    }
-    return Promise.reject(error);
-  }
-);
+// User Authentication API calls
+export const registerUser = (userData) => api.post('/register', userData);
+export const loginUser = (credentials) => api.post('/login', credentials);
+
+// Recipe Management API calls
+export const getRecipes = (searchQuery = '', category = '') => {
+  return api.get('/recipes', {
+    params: { search: searchQuery, category: category },
+  });
+};
+export const getRecipeById = (id) => api.get(`/recipes/${id}`);
+export const createRecipe = (recipeData) => api.post('/recipes', recipeData);
+export const updateRecipe = (id, recipeData) => api.put(`/recipes/${id}`, recipeData);
+export const deleteRecipe = (id) => api.delete(`/recipes/${id}`);
 
 export default api;
