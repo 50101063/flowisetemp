@@ -11,18 +11,26 @@ class User(Base):
     password_hash = Column(String, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
-    recipes = relationship("Recipe", back_populates="owner")
+    # One-to-many relationship with Recipe
+    recipes = relationship("Recipe", back_populates="owner", cascade="all, delete-orphan")
+
+    def __repr__(self):
+        return f"<User(id={self.id}, username='{self.username}')>"
 
 class Recipe(Base):
     __tablename__ = "recipes"
 
     id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     name = Column(String, index=True, nullable=False)
     ingredients = Column(Text, nullable=False)
     instructions = Column(Text, nullable=False)
     category = Column(String, index=True, nullable=False)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now(), server_default=func.now())
 
+    # Many-to-one relationship with User
     owner = relationship("User", back_populates="recipes")
+
+    def __repr__(self):
+        return f"<Recipe(id={self.id}, name='{self.name}', user_id={self.user_id})>"
