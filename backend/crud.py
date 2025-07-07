@@ -1,65 +1,40 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import or_
+from sqlalchemy import func
+from uuid import UUID
 
-from . import models, schemas, auth
+from . import models, schemas
 
-# --- User CRUD Operations ---
+def get_product(db: Session, product_id: UUID):
+    return db.query(models.Product).filter(models.Product.id == product_id).first()
 
-def get_user_by_username(db: Session, username: str):
-    """Retrieves a user by their username."""
-    return db.query(models.User).filter(models.User.username == username).first()
+def get_product_by_name(db: Session, name: str):
+    return db.query(models.Product).filter(models.Product.name == name).first()
 
-def create_user(db: Session, user: schemas.UserCreate):
-    """Creates a new user in the database."""
-    hashed_password = auth.get_password_hash(user.password)
-    db_user = models.User(username=user.username, password_hash=hashed_password)
-    db.add(db_user)
+def get_products(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(models.Product).offset(skip).limit(limit).all()
+
+def create_product(db: Session, product: schemas.ProductCreate):
+    db_product = models.Product(**product.model_dump())
+    db.add(db_product)
     db.commit()
-    db.refresh(db_user)
-    return db_user
+    db.refresh(db_product)
+    return db_product
 
-# --- Recipe CRUD Operations ---
+def update_product(db: Session, product_id: UUID, product: schemas.ProductUpdate):
+    db_product = db.query(models.Product).filter(models.Product.id == product_id).first()
+    if db_product:
+        update_data = product.model_dump(exclude_unset=True)
+        for key, value in update_data.items():
+            setattr(db_product, key, value)
+        db_product.updated_at = func.now() # Manually set updated_at for partial updates
+        db.add(db_product)
+        db.commit()
+        db.refresh(db_product)
+    return db_product
 
-def get_recipe(db: Session, recipe_id: int, user_id: int):
-    """Retrieves a single recipe by ID for a specific user."""
-    return db.query(models.Recipe).filter(models.Recipe.id == recipe_id, models.Recipe.user_id == user_id).first()
-
-def get_recipes(db: Session, user_id: int, skip: int = 0, limit: int = 100, search: Optional[str] = None, category: Optional[str] = None):
-    """Retrieves all recipes for a specific user, with optional search and category filtering."""
-    query = db.query(models.Recipe).filter(models.Recipe.user_id == user_id)
-
-    if search:
-        # Search by recipe name or ingredients
-        query = query.filter(or_(
-            models.Recipe.name.ilike(f"%{search}%"),
-            models.Recipe.ingredients.ilike(f"%{search}%")
-        ))
-    if category:
-        # Filter by category, case-insensitive
-        query = query.filter(models.Recipe.category.ilike(f"%{category}%"))
-
-    return query.offset(skip).limit(limit).all()
-
-def create_user_recipe(db: Session, recipe: schemas.RecipeCreate, user_id: int):
-    """Creates a new recipe associated with a user."""
-    db_recipe = models.Recipe(**recipe.dict(), user_id=user_id)
-    db.add(db_recipe)
-    db.commit()
-    db.refresh(db_recipe)
-    return db_recipe
-
-def update_recipe(db: Session, db_recipe: models.Recipe, recipe_update: schemas.RecipeUpdate):
-    """Updates an existing recipe."""
-    update_data = recipe_update.dict(exclude_unset=True)
-    for key, value in update_data.items():
-        setattr(db_recipe, key, value)
-    db.add(db_recipe)
-    db.commit()
-    db.refresh(db_recipe)
-    return db_recipe
-
-def delete_recipe(db: Session, db_recipe: models.Recipe):
-    """Deletes a recipe from the database."""
-    db.delete(db_recipe)
-    db.commit()
-    return {"message": "Recipe deleted successfully"}
+def delete_product(db: Session, product_id: UUID):
+    db_product = db.query(models.Product).filter(models.Product.id == product_id).first()
+    if db_product:
+        db.delete(db_product)
+        db.commit()
+    return db_product
