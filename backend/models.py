@@ -1,36 +1,17 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Integer, String, Float, DateTime
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
+import uuid
+
 from .database import Base
 
-class User(Base):
-    __tablename__ = "users"
+class Product(Base):
+    __tablename__ = "products"
 
-    id = Column(Integer, primary_key=True, index=True)
-    username = Column(String, unique=True, index=True, nullable=False)
-    password_hash = Column(String, nullable=False)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-
-    # One-to-many relationship with Recipe
-    recipes = relationship("Recipe", back_populates="owner", cascade="all, delete-orphan")
-
-    def __repr__(self):
-        return f"<User(id={self.id}, username='{self.username}')>"
-
-class Recipe(Base):
-    __tablename__ = "recipes"
-
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    name = Column(String, index=True, nullable=False)
-    ingredients = Column(Text, nullable=False)
-    instructions = Column(Text, nullable=False)
-    category = Column(String, index=True, nullable=False)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name = Column(String(255), unique=True, index=True, nullable=False)
+    description = Column(String, nullable=True)
+    price = Column(Float, nullable=False)
+    stock_quantity = Column(Integer, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now(), server_default=func.now())
-
-    # Many-to-one relationship with User
-    owner = relationship("User", back_populates="recipes")
-
-    def __repr__(self):
-        return f"<Recipe(id={self.id}, name='{self.name}', user_id={self.user_id})>"
