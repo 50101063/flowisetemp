@@ -1,139 +1,321 @@
-# Personal Recipe Card Organizer - Backend
+# Backend Product CRUD API
 
-This folder contains the backend services for the Personal Recipe Card Organizer web application. The backend is built with Python using the FastAPI framework, SQLAlchemy for ORM, and PostgreSQL as the database. It provides RESTful API endpoints for user authentication, recipe management (CRUD), searching, and filtering.
+This folder contains the backend implementation for a simple Product CRUD (Create, Read, Update, Delete) API, developed using Python with FastAPI and PostgreSQL.
 
-## Technologies Used
+## Table of Contents
 
-*   **Language:** Python 3.10+
-*   **Web Framework:** FastAPI 0.100+
-*   **Database:** PostgreSQL 15.x
-*   **ORM:** SQLAlchemy
-*   **Authentication:** JWT (JSON Web Tokens)
-*   **Password Hashing:** `bcrypt` via `passlib`
-*   **Environment Management:** `python-dotenv`
+- [Features](#features)
+- [Technology Stack](#technology-stack)
+- [Setup and Installation](#setup-and-installation)
+  - [Prerequisites](#prerequisites)
+  - [Local Development (Docker Compose)](#local-development-docker-compose)
+  - [Manual Setup (Python Virtual Environment)](#manual-setup-python-virtual-environment)
+- [Running the Application](#running-the-application)
+- [API Endpoints](#api-endpoints)
+  - [Base URL](#base-url)
+  - [Product Endpoints](#product-endpoints)
+- [Environment Variables](#environment-variables)
+- [Database Migrations (Alembic)](#database-migrations-alembic)
+- [Testing](#testing)
 
-## Project Structure
+## Features
 
-```
-backend/
-├── main.py             # Main FastAPI application, defines API routes
-├── database.py         # SQLAlchemy engine, session management, and base
-├── models.py           # SQLAlchemy ORM models (User, Recipe)
-├── schemas.py          # Pydantic models for request/response validation
-├── auth.py             # Authentication utilities (JWT, password hashing, current user dependency)
-├── crud.py             # Database interaction functions (CRUD operations)
-├── requirements.txt    # Python dependencies
-└── README.md           # This file
-```
+- Create new products with name, description, price, and stock quantity.
+- Retrieve a list of all products.
+- Retrieve details for a specific product by its ID.
+- Update existing product details (full or partial updates).
+- Delete products by ID.
+- Automatic data validation and serialization using Pydantic.
+- Interactive API documentation (Swagger UI/OpenAPI).
 
-## Setup Instructions
+## Technology Stack
 
-Follow these steps to set up and run the backend locally:
+- **Language:** Python 3.10+
+- **Web Framework:** FastAPI
+- **ASGI Server:** Uvicorn
+- **Database:** PostgreSQL
+- **ORM:** SQLAlchemy 2.0+
+- **Database Migrations:** Alembic
+- **Containerization:** Docker, Docker Compose
 
-### 1. Prerequisites
+## Setup and Installation
 
-*   Python 3.10 or higher
-*   PostgreSQL 15.x installed and running
-*   `pip` (Python package installer)
+### Prerequisites
 
-### 2. Clone the Repository
+Before you begin, ensure you have the following installed:
 
-If you haven't already, clone the main project repository:
+- [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+- [Docker Desktop](https://www.docker.com/products/docker-desktop) (includes Docker Engine and Docker Compose)
+- (Optional, for manual setup) [Python 3.10+](https://www.python.org/downloads/)
 
-```bash
-git clone https://github.com/50101063/flowisetemp.git
-cd flowisetemp
-```
+### Local Development (Docker Compose)
 
-### 3. Navigate to the Backend Directory
+The easiest way to run the backend and its associated PostgreSQL database is using Docker Compose.
 
-```bash
-cd backend
-```
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/50101063/flowisetemp.git
+    cd flowisetemp/backend
+    ```
 
-### 4. Create a Virtual Environment (Recommended)
+2.  **Create a `.env` file:**
+    Copy the `.env.example` file to `.env` and configure your database connection string. For local Docker Compose setup, the default values should work.
+    ```bash
+    cp .env.example .env
+    ```
+    *`.env` content (default for Docker Compose):*
+    ```
+    DATABASE_URL="postgresql://user:password@db:5432/products_db"
+    ```
 
-It's good practice to use a virtual environment to manage dependencies:
+3.  **Build and run the Docker containers:**
+    Navigate to the `backend/` directory and run:
+    ```bash
+    docker-compose up --build -d
+    ```
+    This command will:
+    - Build the Docker image for the FastAPI application.
+    - Start a PostgreSQL database container.
+    - Start the FastAPI application container.
+    - Run database migrations using Alembic to create the `products` table.
 
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
+4.  **Verify containers are running:**
+    ```bash
+    docker-compose ps
+    ```
+    You should see `db` and `web` containers in a healthy state.
 
-### 5. Install Dependencies
+### Manual Setup (Python Virtual Environment)
 
-Install the required Python packages:
+If you prefer to run the application directly on your host machine without Docker (not recommended for production but useful for development):
 
-```bash
-pip install -r requirements.txt
-```
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/50101063/flowisetemp.git
+    cd flowisetemp/backend
+    ```
 
-### 6. Database Setup
+2.  **Create and activate a virtual environment:**
+    ```bash
+    python3 -m venv venv
+    source venv/bin/activate  # On Windows: .\venv\Scripts\activate
+    ```
 
-Ensure your PostgreSQL server is running.
+3.  **Install dependencies:**
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-**A. Create a Database:**
+4.  **Set up PostgreSQL database:**
+    You need a running PostgreSQL instance. Create a database (e.g., `products_db`) and a user with appropriate permissions.
 
-Create a new database for the application. You can do this via `psql` or a GUI tool like pgAdmin:
+5.  **Create a `.env` file:**
+    Copy `.env.example` to `.env` and update `DATABASE_URL` with your PostgreSQL connection string (e.g., `postgresql://your_user:your_password@localhost:5432/products_db`).
 
-```sql
-CREATE DATABASE recipe_organizer_db;
-```
+6.  **Run database migrations:**
+    ```bash
+    alembic upgrade head
+    ```
 
-**B. Environment Variables:**
+## Running the Application
 
-Create a `.env` file in the `backend/` directory with your database connection string and a secret key for JWTs. Replace the placeholders with your actual database credentials:
+Once the setup is complete:
 
-```dotenv
-DATABASE_URL="postgresql://user:password@host:port/recipe_organizer_db"
-SECRET_KEY="your_super_secret_jwt_key_here" # Use a strong, random key
-ALGORITHM="HS256" # JWT algorithm
-ACCESS_TOKEN_EXPIRE_MINUTES=30 # JWT expiry time
-```
+- **With Docker Compose:** The application is already running on `http://localhost:8000`.
+- **Manually:**
+    ```bash
+    uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    ```
+    The `--reload` flag is useful for development as it automatically reloads the server on code changes.
 
-**Example `DATABASE_URL`:**
-`postgresql://postgres:mysecretpassword@localhost:5432/recipe_organizer_db`
+The API documentation (Swagger UI) will be available at `http://localhost:8000/docs`.
 
-**C. Apply Migrations (Initial Schema Creation):**
+## API Endpoints
 
-The `database.py` file contains the `Base.metadata.create_all(engine)` call. When you run `main.py` for the first time, it will create the tables defined in `models.py` if they don't already exist.
+### Base URL
 
-### 7. Run the Backend Application
+`http://localhost:8000`
 
-```bash
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
-```
+### Product Endpoints
 
-*   `uvicorn main:app`: Tells Uvicorn to run the `app` object from `main.py`.
-*   `--reload`: Automatically reloads the server when code changes are detected (useful for development).
-*   `--host 0.0.0.0`: Makes the server accessible from other devices on your network (for development purposes).
-*   `--port 8000`: Runs the server on port 8000.
+#### 1. Create Product
 
-You should see output indicating that the FastAPI application is running.
+- **Endpoint:** `POST /products/`
+- **Description:** Adds a new product to the system.
+- **Request Body (JSON):**
+  ```json
+  {
+    "name": "Example Product",
+    "description": "A detailed description of the example product.",
+    "price": 29.99,
+    "stock_quantity": 100
+  }
+  ```
+- **Response (JSON - 201 Created):**
+  ```json
+  {
+    "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+    "name": "Example Product",
+    "description": "A detailed description of the example product.",
+    "price": 29.99,
+    "stock_quantity": 100,
+    "created_at": "2023-10-27T10:00:00.000000+00:00",
+    "updated_at": "2023-10-27T10:00:00.000000+00:00"
+  }
+  ```
+- **Error Responses:**
+  - `400 Bad Request`: If a product with the same name already exists.
+  - `422 Unprocessable Entity`: For validation errors (e.g., missing required fields, invalid data types).
 
-### 8. Access the API Documentation
+#### 2. Get All Products
 
-Once the server is running, you can access the interactive API documentation (Swagger UI) at:
+- **Endpoint:** `GET /products/`
+- **Description:** Retrieves a list of all products.
+- **Query Parameters (Optional):**
+  - `skip`: Number of items to skip (default: 0)
+  - `limit`: Maximum number of items to return (default: 100)
+- **Response (JSON - 200 OK):**
+  ```json
+  [
+    {
+      "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+      "name": "Example Product 1",
+      "description": "Description 1",
+      "price": 10.00,
+      "stock_quantity": 50,
+      "created_at": "2023-10-27T10:00:00.000000+00:00",
+      "updated_at": "2023-10-27T10:00:00.000000+00:00"
+    },
+    {
+      "id": "b2c3d4e5-f6a7-8901-2345-67890abcdef0",
+      "name": "Example Product 2",
+      "description": null,
+      "price": 15.50,
+      "stock_quantity": 200,
+      "created_at": "2023-10-27T10:05:00.000000+00:00",
+      "updated_at": "2023-10-27T10:05:00.000000+00:00"
+    }
+  ]
+  ```
 
-`http://localhost:8000/docs`
+#### 3. Get Product by ID
 
-Or ReDoc at:
+- **Endpoint:** `GET /products/{product_id}`
+- **Description:** Retrieves details for a specific product using its unique ID.
+- **Path Parameter:** `product_id` (UUID)
+- **Response (JSON - 200 OK):**
+  ```json
+  {
+    "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+    "name": "Example Product",
+    "description": "A detailed description of the example product.",
+    "price": 29.99,
+    "stock_quantity": 100,
+    "created_at": "2023-10-27T10:00:00.000000+00:00",
+    "updated_at": "2023-10-27T10:00:00.000000+00:00"
+  }
+  ```
+- **Error Responses:**
+  - `404 Not Found`: If the product with the given ID does not exist.
 
-`http://localhost:8000/redoc`
+#### 4. Update Product (Full Update)
 
-This documentation allows you to test the API endpoints directly.
+- **Endpoint:** `PUT /products/{product_id}`
+- **Description:** Modifies all details of an existing product using its ID. All fields are required in the request body.
+- **Path Parameter:** `product_id` (UUID)
+- **Request Body (JSON):**
+  ```json
+  {
+    "name": "Updated Product Name",
+    "description": "An updated description.",
+    "price": 35.50,
+    "stock_quantity": 120
+  }
+  ```
+- **Response (JSON - 200 OK):**
+  ```json
+  {
+    "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+    "name": "Updated Product Name",
+    "description": "An updated description.",
+    "price": 35.50,
+    "stock_quantity": 120,
+    "created_at": "2023-10-27T10:00:00.000000+00:00",
+    "updated_at": "2023-10-27T10:30:00.000000+00:00"
+  }
+  ```
+- **Error Responses:**
+  - `400 Bad Request`: If a product with the new name already exists.
+  - `404 Not Found`: If the product with the given ID does not exist.
+  - `422 Unprocessable Entity`: For validation errors.
 
-## Integration with Frontend
+#### 5. Partially Update Product
 
-The backend exposes RESTful API endpoints. The frontend application (developed with React) will make HTTP requests to these endpoints to perform user authentication and recipe management operations.
+- **Endpoint:** `PATCH /products/{product_id}`
+- **Description:** Modifies one or more details of an existing product using its ID. Only provide fields you want to update.
+- **Path Parameter:** `product_id` (UUID)
+- **Request Body (JSON):**
+  ```json
+  {
+    "price": 30.00
+  }
+  ```
+  Or:
+  ```json
+  {
+    "description": "A shorter, updated description.",
+    "stock_quantity": 90
+  }
+  ```
+- **Response (JSON - 200 OK):**
+  ```json
+  {
+    "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+    "name": "Example Product",
+    "description": "A shorter, updated description.",
+    "price": 30.00,
+    "stock_quantity": 90,
+    "created_at": "2023-10-27T10:00:00.000000+00:00",
+    "updated_at": "2023-10-27T10:35:00.000000+00:00"
+  }
+  ```
+- **Error Responses:**
+  - `400 Bad Request`: If a product with the new name already exists.
+  - `404 Not Found`: If the product with the given ID does not exist.
+  - `422 Unprocessable Entity`: For validation errors.
 
-**Base API URL:** `http://localhost:8000/api/v1` (adjust if you change the port or host)
+#### 6. Delete Product
 
-Ensure your frontend is configured to point to the correct backend URL.
+- **Endpoint:** `DELETE /products/{product_id}`
+- **Description:** Removes a product from the system using its ID.
+- **Path Parameter:** `product_id` (UUID)
+- **Response (204 No Content):** No content in the response body.
+- **Error Responses:**
+  - `404 Not Found`: If the product with the given ID does not exist.
 
-## Security Considerations
+## Environment Variables
 
-*   **Secret Key:** Keep your `SECRET_KEY` in the `.env` file secure and never commit it to version control. Generate a strong, random key for production.
-*   **Password Hashing:** Passwords are hashed using `bcrypt` before storage.
-*   **HTTPS:** In a production environment, ensure the backend is served over HTTPS to encrypt all communication.
-*   **CORS:** Cross-Origin Resource Sharing (CORS) is enabled in `main.py` to allow the frontend (running on a different origin) to communicate with the backend. Adjust `allow_origins` in `main.py` for production.
+The application uses the following environment variables, typically defined in a `.env` file:
+
+- `DATABASE_URL`: The connection string for the PostgreSQL database. Example: `postgresql://user:password@host:port/dbname`.
+
+## Database Migrations (Alembic)
+
+Database schema changes are managed using Alembic. The `alembic.ini` and `alembic/versions/` directories are set up for this.
+
+- To create a new migration script (after changing `models.py`):
+  ```bash
+  alembic revision --autogenerate -m "Description of changes"
+  ```
+- To apply pending migrations:
+  ```bash
+  alembic upgrade head
+  ```
+- To revert migrations:
+  ```bash
+  alembic downgrade -1 # Reverts the last migration
+  ```
+
+## Testing
+
+(Future section: Details on how to run tests for the API.)
