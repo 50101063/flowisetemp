@@ -1,104 +1,82 @@
-# Personal Recipe Card Organizer - Frontend
+# Product CRUD Frontend
 
-This repository contains the frontend application for the Personal Recipe Card Organizer, built using React, Vite, and Tailwind CSS. This application provides a user-friendly interface for managing personal recipes, including features for authentication, recipe CRUD operations, and searching/filtering.
-
-## Features
-
-*   **User Authentication:** Register, Login, and Logout functionality.
-*   **Recipe Management:** Create, View, Edit, and Delete personal recipes.
-*   **Search & Filter:** Easily find recipes by name, ingredient, or category.
-*   **Responsive Design:** Adapts seamlessly to desktop, tablet, and mobile screens.
-*   **Intuitive UI:** Clean and easy-to-navigate user interface.
+This is a simple web-based frontend application for managing products, designed to interact with the Simple CRUD API backend.
 
 ## Technologies Used
 
-*   **Frontend Framework:** React 18.x
-*   **Build Tool:** Vite 5.x
-*   **Styling:** Tailwind CSS 3.x
-*   **Routing:** React Router DOM 6.x
-*   **API Client:** Axios
-*   **State Management:** React Context API (for global state)
+*   **HTML5:** For structuring the web page.
+*   **CSS3:** For styling the user interface.
+*   **JavaScript (ES6+):** For dynamic interactions and API communication.
 
-## Setup and Running the Application
+## Features
 
-Follow these steps to get the frontend application up and running on your local machine.
+*   View a list of all products.
+*   Add a new product (name, description, price, stock quantity).
+*   Edit existing product details.
+*   Delete products.
+
+## Setup and Execution
+
+To run this frontend application, you need to ensure the backend API is running and accessible.
 
 ### Prerequisites
 
-*   Node.js (LTS version recommended, e.g., v18.x or v20.x)
-*   npm or Yarn (npm is included with Node.js)
+*   A modern web browser (Chrome, Firefox, Edge, Safari, etc.).
+*   The **backend API must be running** and accessible at `http://localhost:8000`. Please refer to the backend's `README.md` for instructions on how to set up and run the backend.
 
-### Installation
+### Running the Frontend
 
-1.  **Clone the repository:**
+This frontend is a static HTML, CSS, and JavaScript application. You can run it directly in your web browser.
+
+1.  **Navigate to the `frontend/` directory:**
     ```bash
-    git clone https://github.com/50101063/flowisetemp.git
-    cd flowisetemp
+    cd frontend/
     ```
 
-2.  **Navigate to the frontend directory:**
-    ```bash
-    cd frontend
-    ```
+2.  **Open `index.html` in your web browser:**
+    You can typically do this by double-clicking the `index.html` file in your file explorer.
+    Alternatively, you can open your browser and use `File > Open File...` and select `index.html`.
 
-3.  **Install dependencies:**
-    ```bash
-    npm install
-    # or if you use yarn
-    # yarn install
-    ```
+    **Note on CORS:**
+    If you encounter Cross-Origin Resource Sharing (CORS) errors in your browser's console when the frontend tries to communicate with the backend, it means your browser is preventing the frontend (served from `file://` or a different origin) from making requests to `http://localhost:8000`.
+    The FastAPI backend is typically configured to handle CORS for `http://localhost:8000` or specific origins. If you are running the frontend directly from `file://`, you might need to:
+    *   **Option A (Recommended for development): Use a simple local web server.**
+        You can use Python's built-in HTTP server for this.
+        From the `frontend/` directory, run:
+        ```bash
+        python -m http.server 8000
+        # or any other port, e.g., 8080
+        python -m http.server 8080
+        ```
+        Then, open your browser and go to `http://localhost:8000` (or `http://localhost:8080` if you used that port).
+        **Important:** If you run the frontend on a port other than 8000 (e.g., 8080), and the backend is on 8000, ensure the backend's CORS configuration allows requests from `http://localhost:8080`. The current `script.js` assumes the backend is on `http://localhost:8000`.
 
-### Configuration
+    *   **Option B (Less recommended for general use, but quick for testing): Disable CORS in your browser.**
+        This is generally **NOT recommended for security reasons** and should only be done for local development and testing in a controlled environment. Instructions vary by browser. For Chrome, you might run it with a `--disable-web-security` flag (use a separate profile for this).
 
-Create a `.env` file in the `frontend/` directory (at the same level as `package.json`) and add the following environment variable:
+### Interacting with the Application
 
-```
-VITE_API_BASE_URL=http://localhost:8000/api
-```
-*   **Note:** Replace `http://localhost:8000/api` with the actual URL of your backend API if it's hosted elsewhere.
+Once `index.html` is open in your browser:
 
-### Running the Application
-
-To start the development server:
-
-```bash
-npm run dev
-# or if you use yarn
-# yarn dev
-```
-
-This will typically start the application on `http://localhost:5173` (or another available port). The console will provide the exact URL.
+*   **Add Product:** Fill in the "Add/Edit Product" form and click "Add Product".
+*   **View Products:** All products will be listed in the "All Products" table automatically upon loading and after any successful CUD operation.
+*   **Edit Product:** Click the "Edit" button next to a product in the table. The form will be pre-filled. Modify details and click "Update Product". Click "Cancel Edit" to revert the form.
+*   **Delete Product:** Click the "Delete" button next to a product. A confirmation dialog will appear.
 
 ## Project Structure
 
 ```
 frontend/
-├── public/                # Static assets (index.html, favicon, etc.)
-├── src/                   # Main application source code
-│   ├── assets/            # Images, icons, fonts
-│   ├── components/        # Reusable UI components (e.g., Button, InputField, Navbar)
-│   ├── pages/             # Top-level components representing distinct views/pages
-│   ├── api/               # API service layer for backend communication
-│   ├── context/           # React Context API providers for global state (e.g., AuthContext)
-│   ├── hooks/             # Custom React hooks
-│   ├── App.jsx            # Main application component, handles routing
-│   └── main.jsx           # Entry point for the React application
-├── index.html             # The main HTML file
-├── package.json           # Project dependencies and scripts
-├── postcss.config.js      # PostCSS configuration (for Tailwind CSS)
-├── tailwind.config.js     # Tailwind CSS configuration
-├── vite.config.js         # Vite build tool configuration
-└── README.md              # This file
+├── index.html          # Main HTML file
+├── style.css           # Stylesheet for the application
+└── script.js           # JavaScript logic for API interaction and DOM manipulation
+└── README.md           # This file
 ```
 
-## API Integration
+## Communication with Backend Developer
 
-The frontend interacts with the backend API to perform all data operations. Ensure your backend server is running and accessible at the `VITE_API_BASE_URL` specified in your `.env` file.
+*   The frontend expects the backend API to be available at `http://localhost:8000`. If the backend is deployed at a different URL or port, the `API_BASE_URL` constant in `script.js` will need to be updated accordingly.
+*   The frontend relies on the exact API endpoint paths and JSON payload structures as specified in the Solution Architect's document (`/products`, `/products/{id}`). Any deviations in the backend implementation will require corresponding frontend adjustments.
+*   The frontend assumes the backend handles CORS appropriately for local development (e.g., allowing requests from `http://localhost:8000` or `file://`).
 
-## Contributing
-
-For any contributions, please follow the project's guidelines and submit pull requests.
-
-## License
-
-[Specify your license here, e.g., MIT, Apache 2.0]
+---
