@@ -1,110 +1,62 @@
-# Database Folder for Personal Recipe Card Organizer
+# Database Setup and Management for Product CRUD API
 
-This `database/` folder contains all the SQL scripts and related configurations for the Personal Recipe Card Organizer application's data layer. The database is designed to store user accounts and their associated recipe entries, ensuring data integrity and efficient retrieval.
+This `database/` folder contains essential scripts and documentation for setting up and managing the PostgreSQL database used by the Product CRUD API.
 
-## 1. Database Technologies
+## 1. Database Technology Stack
 
-*   **Database System:** PostgreSQL 15.x
-*   **ORM (used by Backend):** SQLAlchemy (Python)
+*   **Database System:** PostgreSQL
+*   **ORM/Migrations:** SQLAlchemy and Alembic (managed within the `backend/` service)
 
-PostgreSQL was chosen for its robustness, ACID compliance, performance, and scalability, making it an ideal relational database for this application.
+## 2. Database Setup
 
-## 2. Schema Overview
+The easiest way to set up the PostgreSQL database is by using the `docker-compose.yml` file located in the `backend/` directory. This file defines a `db` service that will provision a PostgreSQL container.
 
-The database schema is defined in `schema.sql` and consists of two primary tables:
+To start the database along with the backend API:
 
-### `users` Table
-Stores user account information.
-
-| Column Name   | Data Type                   | Constraints                                |
-| :------------ | :-------------------------- | :----------------------------------------- |
-| `id`          | `SERIAL` (Primary Key)      | Unique identifier for each user            |
-| `username`    | `VARCHAR(255)`              | Unique, Not Null                           |
-| `password_hash` | `VARCHAR(255)`              | Not Null (stores securely hashed password) |
-| `created_at`  | `TIMESTAMP WITH TIME ZONE`  | Default: `CURRENT_TIMESTAMP`               |
-
-### `recipes` Table
-Stores individual recipe entries, linked to a user.
-
-| Column Name   | Data Type                   | Constraints                                |
-| :------------ | :-------------------------- | :----------------------------------------- |
-| `id`          | `SERIAL` (Primary Key)      | Unique identifier for each recipe          |
-| `user_id`     | `INTEGER`                   | Not Null, Foreign Key to `users.id`        |
-| `name`        | `VARCHAR(255)`              | Not Null                                   |
-| `ingredients` | `TEXT`                      | Stores multi-line ingredient list          |
-| `instructions`| `TEXT`                      | Stores multi-line cooking instructions     |
-| `category`    | `VARCHAR(100)`              | e.g., "Breakfast", "Dinner", "Dessert"   |
-| `created_at`  | `TIMESTAMP WITH TIME ZONE`  | Default: `CURRENT_TIMESTAMP`               |
-| `updated_at`  | `TIMESTAMP WITH TIME ZONE`  | Default: `CURRENT_TIMESTAMP`, auto-updated |
-
-**Relationship:** There is a one-to-many relationship between `users` and `recipes`, meaning one user can have many recipes.
-
-**Indexes:** Indexes are created on `user_id` (for efficient lookup of a user's recipes), `name` (for recipe name search), and `category` (for filtering recipes).
-
-## 3. Local Development Setup Instructions (PostgreSQL)
-
-To set up the database for local development, follow these steps:
-
-1.  **Install PostgreSQL:**
-    *   Download and install PostgreSQL 15.x from the official website ([https://www.postgresql.org/download/](https://www.postgresql.org/download/)) or use a package manager (e.g., `brew install postgresql` on macOS, `sudo apt-get install postgresql` on Debian/Ubuntu).
-
-2.  **Create a Database User (Optional but Recommended):**
-    It's good practice to create a dedicated user for your application.
+1.  Navigate to the `backend/` directory:
     ```bash
-    sudo -u postgres psql
-    CREATE USER recipe_user WITH PASSWORD 'your_secure_password';
-    ALTER USER recipe_user WITH CREATEDB; -- Grant permission to create databases
-    \q
+    cd backend/
     ```
-    Replace `your_secure_password` with a strong password.
-
-3.  **Create the Database:**
+2.  Start the Docker Compose services:
     ```bash
-    sudo -u postgres psql
-    CREATE DATABASE recipe_organizer OWNER recipe_user;
-    \q
+    docker compose up -d --build
     ```
-    Or, if you logged in as `recipe_user` after granting `CREATEDB`:
+    This command will:
+    *   Build the `backend` service image.
+    *   Start the `db` (PostgreSQL) service.
+    *   Start the `backend` (FastAPI) service.
+
+The PostgreSQL database will be accessible on port `5432` on your Docker host.
+
+### Database Connection Details (from `backend/.env.example` and `docker-compose.yml`)
+
+*   **Host:** `db` (when connecting from `backend` service within Docker network), or `localhost` / `127.0.0.1` (when connecting from outside Docker, if port is mapped).
+*   **Port:** `5432`
+*   **Database Name:** `products_db`
+*   **User:** `user`
+*   **Password:** `password`
+
+## 3. Database Migrations
+
+Database schema changes are managed using Alembic, which is integrated with the `backend/` service. The initial schema for the `products` table is defined in the Alembic migration script located at `backend/alembic/versions/initial_products_table.py`.
+
+To apply pending database migrations (e.g., after the database container is started for the first time or after schema changes):
+
+1.  Ensure your Docker Compose services are running (`docker compose up -d`).
+2.  Execute the Alembic upgrade command via the `backend` service:
     ```bash
-    psql -U recipe_user -d postgres
-    CREATE DATABASE recipe_organizer;
-    \q
+    docker compose run --rm backend alembic upgrade head
     ```
+    This command will connect to the `db` service and apply any unapplied migrations, creating the necessary tables and columns.
 
-4.  **Apply the Schema:**
-    Navigate to this `database/` folder in your terminal and apply the schema to your newly created database.
-    ```bash
-    psql -U recipe_user -d recipe_organizer -f schema.sql
-    ```
-    You will be prompted for the password for `recipe_user`.
+## 4. Database Schema Reference
 
-    This command will create the `users` and `recipes` tables, set up foreign key constraints, and add indexes.
+For a quick reference of the `products` table schema, you can find a basic SQL script in this folder:
 
-## 4. Integration with Backend
+*   [`schema.sql`](schema.sql)
 
-The backend application (developed using Python FastAPI and SQLAlchemy) will connect to this PostgreSQL database using a connection string. This connection string is typically configured via environment variables.
-
-Example `DATABASE_URL` for local development:
-
-```
-DATABASE_URL="postgresql://recipe_user:your_secure_password@localhost:5432/recipe_organizer"
-```
-
-The SQLAlchemy ORM in the backend will handle all database interactions, abstracting the raw SQL queries defined in `schema.sql`. It will manage sessions, execute CRUD operations, and ensure proper data mapping between Python objects and database rows.
-
-## 5. Backup and Recovery
-
-Regular backups of the `recipe_organizer` database are crucial. PostgreSQL provides tools like `pg_dump` for creating backups and `pg_restore` for restoring them.
-
-Example backup command:
-```bash
-pg_dump -U recipe_user -d recipe_organizer > recipe_organizer_backup.sql
-```
-
-## 6. Security Considerations
-
-*   **Password Hashing:** User passwords are not stored directly but as secure hashes (`password_hash`).
-*   **Least Privilege:** The database user (`recipe_user`) should ideally be granted only the necessary permissions required by the application.
-*   **Secure Connection:** Ensure that the connection between the backend and the database is secure, especially in production environments (e.g., using SSL/TLS).
+This script provides the `CREATE TABLE` statement for the `products` table, reflecting the structure defined by the Alembic migration. It is intended for reference or manual setup if not using Docker Compose and Alembic.
 
 ---
+
+**Note:** For development, you might want to connect to the PostgreSQL database using a GUI tool (e.g., DBeaver, pgAdmin) or the `psql` command-line client. Use the connection details provided above.
